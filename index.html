@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Income Tax Calculator FY 2024-25 | Complete ITR Tool</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        .container { max-width: 1100px; margin: 0 auto; }
+        h1 { text-align: center; color: #fff; margin-bottom: 10px; font-size: 1.8rem; }
+        .subtitle { text-align: center; color: #8892b0; margin-bottom: 30px; font-size: 0.95rem; }
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e8e8e8;
+        }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 6px; font-weight: 500; color: #444; font-size: 0.9rem; }
+        .label-hint { font-weight: normal; color: #888; font-size: 0.8rem; }
+        .label-limit { font-weight: normal; color: #e65100; font-size: 0.75rem; display: block; margin-top: 2px; }
+        .weight-badge { background: #4caf50; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 5px; }
+        input[type="number"], input[type="date"], input[type="text"], select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus { outline: none; border-color: #4a90d9; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; }
+        .grid-5 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 10px; }
+        @media (max-width: 768px) { .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; } }
+        .btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #4a90d9 0%, #357abd 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(74, 144, 217, 0.4); }
+        .btn-full { width: 100%; padding: 15px; font-size: 1.1rem; }
+        .btn-small { padding: 8px 16px; font-size: 0.85rem; }
+        .btn-success { background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%); }
+        .btn-danger { background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); }
+        .btn-secondary { background: linear-gradient(135deg, #607d8b 0%, #455a64 100%); }
+        .results { display: none; }
+        .results.show { display: block; }
+        .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 600px) { .comparison { grid-template-columns: 1fr; } }
+        .regime-card { background: #f8f9fa; border-radius: 12px; padding: 20px; position: relative; }
+        .regime-card.recommended { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border: 2px solid #4caf50; }
+        .regime-card.recommended::before {
+            content: 'RECOMMENDED';
+            position: absolute;
+            top: -12px;
+            right: 15px;
+            background: #4caf50;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .regime-title { font-size: 1rem; font-weight: 600; color: #1a1a2e; margin-bottom: 15px; }
+        .tax-amount { font-size: 1.8rem; font-weight: 700; color: #1a1a2e; margin-bottom: 5px; }
+        .tax-label { font-size: 0.85rem; color: #666; margin-bottom: 15px; }
+        .breakdown { margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd; }
+        .breakdown-item { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem; }
+        .breakdown-item span:first-child { color: #666; }
+        .breakdown-item span:last-child { font-weight: 500; }
+        .savings-banner {
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .savings-amount { font-size: 1.5rem; font-weight: 700; margin-bottom: 5px; }
+        .info-box { background: #e3f2fd; border: 1px solid #2196f3; border-radius: 8px; padding: 12px; margin: 10px 0; font-size: 0.85rem; color: #1565c0; }
+        .warning-box { background: #fff3e0; border: 1px solid #ff9800; border-radius: 8px; padding: 12px; margin: 10px 0; font-size: 0.85rem; color: #e65100; }
+        .success-box { background: #e8f5e9; border: 1px solid #4caf50; border-radius: 8px; padding: 12px; margin: 10px 0; font-size: 0.85rem; color: #2e7d32; }
+        .collapsible { cursor: pointer; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        .collapsible::after { content: '+'; font-size: 1.2rem; font-weight: bold; color: #4a90d9; }
+        .collapsible.active::after { content: '-'; }
+        .section-content { display: none; padding-top: 10px; }
+        .section-content.show { display: block; }
+        .tab-container { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn {
+            padding: 12px 24px;
+            border: 2px solid #4a90d9;
+            background: white;
+            color: #4a90d9;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .tab-btn.active { background: #4a90d9; color: white; }
+        .expense-category { background: #f8f9fa; border-radius: 10px; padding: 15px; margin-bottom: 15px; }
+        .expense-category h4 { color: #1a1a2e; margin-bottom: 12px; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .category-icon { width: 24px; height: 24px; background: #4a90d9; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .regime-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin-left: 5px; }
+        .badge-both { background: #e8f5e9; color: #2e7d32; }
+        .badge-old { background: #e3f2fd; color: #1565c0; }
+        .badge-new { background: #fce4ec; color: #c2185b; }
+        .head-of-income { border-left: 4px solid #4a90d9; padding-left: 15px; margin-bottom: 20px; }
+        .head-of-income h3 { color: #1a1a2e; font-size: 1rem; margin-bottom: 10px; }
+        .hidden { display: none !important; }
+
+        /* Depreciation Calculator Styles */
+        .asset-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
+        .asset-table th, .asset-table td { padding: 10px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+        .asset-table th { background: #1a1a2e; color: white; }
+        .asset-table tr:nth-child(even) { background: #f8f9fa; }
+        .asset-table tr:hover { background: #e3f2fd; }
+        .asset-row-actions { display: flex; gap: 5px; }
+        .dep-summary { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-radius: 10px; padding: 15px; margin-top: 15px; }
+        .dep-summary-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #81c784; }
+        .dep-summary-item:last-child { border-bottom: none; font-weight: 600; }
+
+        /* Income Head Tabs */
+        .income-head-tabs { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 20px; }
+        .income-head-tab {
+            padding: 10px 15px;
+            background: #f5f5f5;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        .income-head-tab:hover { background: #e3f2fd; }
+        .income-head-tab.active { background: #4a90d9; color: white; border-color: #4a90d9; }
+        .income-head-tab.has-value { border-color: #4caf50; }
+        .income-head-content { display: none; }
+        .income-head-content.active { display: block; }
+
+        /* Toggle Switch */
+        .toggle-switch { position: relative; display: inline-block; width: 50px; height: 26px; margin-left: 10px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 26px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px; width: 20px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider { background-color: #4caf50; }
+        input:checked + .toggle-slider:before { transform: translateX(24px); }
+
+        .slabs-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
+        .slabs-table th, .slabs-table td { padding: 10px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+        .slabs-table th { background: #f5f5f5; font-weight: 600; }
+
+        .disclaimer { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 15px; margin-top: 20px; font-size: 0.85rem; color: #856404; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧾 Indian Income Tax Calculator</h1>
+        <p class="subtitle">FY 2024-25 (AY 2025-26) | All Heads of Income | Depreciation Calculator | Weighted Deductions</p>
+
+        <!-- Assessee Category Selection -->
+        <div class="card">
+            <h2 class="card-title">👤 Select Assessee Category</h2>
+            <div class="tab-container">
+                <button class="tab-btn active" onclick="switchAssesseeType('individual')">Individual</button>
+                <button class="tab-btn" onclick="switchAssesseeType('huf')">HUF</button>
+                <button class="tab-btn" onclick="switchAssesseeType('firm')">Partnership Firm</button>
+                <button class="tab-btn" onclick="switchAssesseeType('llp')">LLP</button>
+                <button class="tab-btn" onclick="switchAssesseeType('company')">Company</button>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Age Group <span class="label-hint">(For Individuals)</span></label>
+                    <select id="ageGroup">
+                        <option value="general">Below 60 years</option>
+                        <option value="senior">60-80 years (Senior Citizen)</option>
+                        <option value="supersenior">Above 80 years (Super Senior)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Financial Year</label>
+                    <select id="financialYear">
+                        <option value="2024-25" selected>FY 2024-25 (AY 2025-26)</option>
+                        <option value="2023-24">FY 2023-24 (AY 2024-25)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- HEADS OF INCOME -->
+        <div class="card">
+            <h2 class="card-title">📊 Heads of Income</h2>
+            <div class="info-box">
+                💡 Income Tax Act categorizes income under 5 heads. Click each tab to enter income/loss under that head.
+            </div>
+
+            <div class="income-head-tabs">
+                <div class="income-head-tab active" onclick="switchIncomeHead('salary')" id="tab-salary">💰 Salary</div>
+                <div class="income-head-tab" onclick="switchIncomeHead('house')" id="tab-house">🏠 House Property</div>
+                <div class="income-head-tab" onclick="switchIncomeHead('business')" id="tab-business">💼 Business/Profession</div>
+                <div class="income-head-tab" onclick="switchIncomeHead('capital')" id="tab-capital">📈 Capital Gains</div>
+                <div class="income-head-tab" onclick="switchIncomeHead('other')" id="tab-other">📋 Other Sources</div>
+            </div>
+
+            <!-- HEAD 1: SALARY -->
+            <div class="income-head-content active" id="head-salary">
+                <div class="head-of-income">
+                    <h3>💰 Income from Salary (Section 15-17)</h3>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Basic Salary (Annual)</label>
+                            <input type="number" id="basicSalary" placeholder="0" value="0" onchange="calculateSalaryIncome()">
+                        </div>
+                        <div class="form-group">
+                            <label>Dearness Allowance (DA)</label>
+                            <input type="number" id="da" placeholder="0" value="0" onchange="calculateSalaryIncome()">
+                        </div>
+                    </div>
+                    <div class="grid-3">
+                        <div class="form-group">
+                            <label>House Rent Allowance (HRA)</label>
+                            <input type="number" id="hra" placeholder="0" value="0" onchange="calculateSalaryIncome()">
+                        </div>
+                        <div class="form-group">
+                            <label>Actual Rent Paid (Annual)</label>
+                            <input type="number" id="actualRent" placeholder="0" value="0" onchange="calculateSalaryIncome()">
+                        </div>
+                        <div class="form-group">
+                            <label>City Type</label>
+                            <select id="cityType" onchange="calculateSalaryIncome()">
+                                <option value="metro">Metro (50%)</option>
+                                <option value="nonmetro">Non-Metro (40%)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid-3">
+                        <div class="form-group">
+                            <label>Leave Travel Allowance (LTA)</label>
+                            <input type="number" id="lta" placeholder="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Special Allowances (Taxable)</label>
+                            <input type="number" id="specialAllowance" placeholder="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Bonus / Commission</label>
+                            <input type="number" id="salaryBonus" placeholder="0" value="0">
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Employer's PF Contribution</label>
+                            <input type="number" id="employerPF" placeholder="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Perquisites Value (Sec 17(2))</label>
+                            <input type="number" id="perquisites" placeholder="0" value="0">
+                        </div>
+                    </div>
+                    <div class="success-box" id="salaryCalculation">
+                        <strong>Salary Income Summary:</strong><br>
+                        Gross Salary: ₹0 | HRA Exemption: ₹0 | <strong>Net Taxable Salary: ₹0</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HEAD 2: HOUSE PROPERTY -->
+            <div class="income-head-content" id="head-house">
+                <div class="head-of-income">
+                    <h3>🏠 Income from House Property (Section 22-27)</h3>
+                    <div id="houseProperties">
+                        <div class="expense-category" id="property-1">
+                            <h4>Property 1</h4>
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label>Property Type</label>
+                                    <select class="propertyType" onchange="calculateHouseIncome()">
+                                        <option value="selfoccupied">Self-Occupied</option>
+                                        <option value="letout">Let Out</option>
+                                        <option value="deemed">Deemed Let Out</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Annual Rent Received / Receivable</label>
+                                    <input type="number" class="annualRent" placeholder="0" value="0" onchange="calculateHouseIncome()">
+                                </div>
+                            </div>
+                            <div class="grid-3">
+                                <div class="form-group">
+                                    <label>Municipal Taxes Paid</label>
+                                    <input type="number" class="municipalTax" placeholder="0" value="0" onchange="calculateHouseIncome()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Home Loan Interest (Sec 24b)</label>
+                                    <input type="number" class="homeLoanInterest" placeholder="0" value="0" onchange="calculateHouseIncome()">
+                                    <span class="label-limit">Max ₹2L for self-occupied | Unlimited for let-out</span>
+                                </div>
+                                <div class="form-group">
+                                    <label>Pre-construction Interest</label>
+                                    <input type="number" class="preConstructionInt" placeholder="0" value="0">
+                                    <span class="label-limit">1/5th of total, for 5 years</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-small btn-secondary" onclick="addProperty()">+ Add Another Property</button>
+                    <div class="success-box" id="houseCalculation" style="margin-top: 15px;">
+                        <strong>House Property Income:</strong> ₹0 | Standard Deduction (30%): ₹0 | Interest Deduction: ₹0 | <strong>Net: ₹0</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HEAD 3: BUSINESS/PROFESSION -->
+            <div class="income-head-content" id="head-business">
+                <div class="head-of-income">
+                    <h3>💼 Profits & Gains from Business/Profession (Section 28-44)</h3>
+
+                    <div class="form-group">
+                        <label>Business Type</label>
+                        <select id="businessType" onchange="toggleBusinessSections()">
+                            <option value="none">Not Applicable</option>
+                            <option value="presumptive44AD">Presumptive - Sec 44AD (Business)</option>
+                            <option value="presumptive44ADA">Presumptive - Sec 44ADA (Profession)</option>
+                            <option value="presumptive44AE">Presumptive - Sec 44AE (Goods Carriage)</option>
+                            <option value="regular">Regular Business (Books of Accounts)</option>
+                        </select>
+                    </div>
+
+                    <!-- Presumptive 44AD -->
+                    <div id="section44AD" class="hidden expense-category">
+                        <h4>📊 Section 44AD - Presumptive Business Income</h4>
+                        <p class="label-hint" style="margin-bottom: 10px;">For businesses with turnover ≤ ₹3Cr (digital 95%) or ≤ ₹2Cr</p>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Gross Turnover / Receipts</label>
+                                <input type="number" id="turnover44AD" placeholder="0" value="0" onchange="calculate44AD()">
+                            </div>
+                            <div class="form-group">
+                                <label>Digital Receipts (Bank/UPI)</label>
+                                <input type="number" id="digital44AD" placeholder="0" value="0" onchange="calculate44AD()">
+                                <span class="label-limit">Taxed at 6% | Cash at 8%</span>
+                            </div>
+                        </div>
+                        <div class="success-box" id="calc44AD">
+                            Deemed Profit: ₹0 (Digital: ₹0 × 6% + Cash: ₹0 × 8%)
+                        </div>
+                    </div>
+
+                    <!-- Presumptive 44ADA -->
+                    <div id="section44ADA" class="hidden expense-category">
+                        <h4>⚖️ Section 44ADA - Presumptive Professional Income</h4>
+                        <p class="label-hint" style="margin-bottom: 10px;">For specified professionals with receipts ≤ ₹75L (digital) or ≤ ₹50L</p>
+                        <div class="form-group">
+                            <label>Gross Professional Receipts</label>
+                            <input type="number" id="receipts44ADA" placeholder="0" value="0" onchange="calculate44ADA()">
+                        </div>
+                        <div class="success-box" id="calc44ADA">
+                            Deemed Profit (50%): ₹0
+                        </div>
+                    </div>
+
+                    <!-- Presumptive 44AE -->
+                    <div id="section44AE" class="hidden expense-category">
+                        <h4>🚛 Section 44AE - Goods Carriage</h4>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Heavy Goods Vehicles (Count)</label>
+                                <input type="number" id="heavyVehicles" placeholder="0" value="0" onchange="calculate44AE()">
+                                <span class="label-limit">₹1,000/ton/month or ₹7,500/vehicle/month</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Other Vehicles (Count)</label>
+                                <input type="number" id="otherVehicles" placeholder="0" value="0" onchange="calculate44AE()">
+                                <span class="label-limit">₹7,500/vehicle/month</span>
+                            </div>
+                        </div>
+                        <div class="success-box" id="calc44AE">
+                            Deemed Profit: ₹0
+                        </div>
+                    </div>
+
+                    <!-- Regular Business -->
+                    <div id="sectionRegularBusiness" class="hidden">
+                        <div class="expense-category">
+                            <h4>📒 Book Profit Computation</h4>
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label>Gross Receipts / Turnover</label>
+                                    <input type="number" id="grossReceipts" placeholder="0" value="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Other Business Income</label>
+                                    <input type="number" id="otherBusinessIncome" placeholder="0" value="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Deductible Expenses with Weights -->
+                        <div class="expense-category">
+                            <h4><span class="category-icon">1</span> Expenses - 100% Deductible</h4>
+                            <div class="grid-3">
+                                <div class="form-group">
+                                    <label>Rent (Sec 30) <span class="weight-badge">100%</span></label>
+                                    <input type="number" id="expRent" placeholder="0" value="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Repairs & Maintenance (Sec 31) <span class="weight-badge">100%</span></label>
+                                    <input type="number" id="expRepairs" placeholder="0" value="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Insurance (Sec 36(1)(i)) <span class="weight-badge">100%</span></label>
+                                    <input type="number" id="expInsurance" placeholder="0" value="0">
+                                </div>
+                            </div>
+                            <div class="grid-3">
+                                <div class="form-group">
+                                    <label>Salaries & Wages <span class="weight-badge">100%</span></label>
+                                    <input type="number" id="expSalaries" placeholder="0" value="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Interest on Loan (Sec 36(1)(iii)) <span class="weight-badge">100%</span></label>
+                                    <input type="number" id="expInterest" placeholder="0" value="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Bad Debts (Sec 36(1)(vii)) <span class="weight-badge">100%</span></label>
+                                    <input type="number" id="expBadDebts" placeholder="0" value="0">
+                                </div>
+                            </div>
+                            <div class="grid-3">
+                                <div class="form-group">
+                                    <label>Employer PF/ESI (Sec 36(1)(iv)) <span class="weight-badge">100%</span></label>
+                                    <input type="number" id="expEmployerPF" placeholder="0" value="0">
+                                    <span class="label-limit">If paid before due date</span>
+                                </div>
+                                <div class="form-group">
+                                    <label>Gratuity Fund (Sec 36(1)(v)) <span class="weight-badge">100%</span></label>
+                                    <input type="number" id="expGratuity" placeholder="0" value="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Other Expenses (Sec 37) <span class="weight-badge">100%</span></label>
+                                    <input type="number" id="expOther" placeholder="0" value="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Weighted Deductions -->
+                        <div class="expense-category">
+                            <h4><span class="category-icon">2</span> Weighted Deductions (As per IT Act)</h4>
+                            <div class="info-box">
+                                💡 Certain expenses qualify for weighted deduction - you can claim more than 100% of actual expenditure.
+                            </div>
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label>Scientific Research - In-house (Sec 35(1)) <span class="weight-badge">100%</span></label>
+                                    <input type="number" id="expResearchInhouse" placeholder="0" value="0">
+                                    <span class="label-limit">Revenue expenditure on scientific research</span>
+                                </div>
+                                <div class="form-group">
+                                    <label>Scientific Research - Approved Institution (Sec 35(1)(ii)) <span class="weight-badge">100%</span></label>
+                                    <input type="number" id="expResearchApproved" placeholder="0" value="0">
+                                </div>
+                            </div>
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label>Capital Expenditure on Scientific Research (Sec 35(1)(iv)) <span class="weight-badge">100%</span></label>
+                                    <input type="number" id="expResearchCapital" placeholder="0" value="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Expenditure on Specified Business (Sec 35AD) <span class="weight-badge">100%</span></label>
+                                    <input type="number" id="exp35AD" placeholder="0" value="0">
+                                    <span class="label-limit">Cold chain, warehousing, hospital, etc.</span>
+                                </div>
+                            </div>
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label>Expenditure on Skill Development (Sec 35CCD) <span class="weight-badge">100%</span></label>
+                                    <input type="number" id="expSkillDev" placeholder="0" value="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Agricultural Extension Project (Sec 35CCC) <span class="weight-badge">100%</span></label>
+                                    <input type="number" id="expAgriExtension" placeholder="0" value="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cost of Goods Sold -->
+                        <div class="expense-category">
+                            <h4><span class="category-icon">3</span> Cost of Goods Sold</h4>
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label>Opening Stock</label>
+                                    <input type="number" id="openingStock" placeholder="0" value="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Purchases</label>
+                                    <input type="number" id="purchases" placeholder="0" value="0">
+                                </div>
+                            </div>
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label>Direct Expenses</label>
+                                    <input type="number" id="directExpenses" placeholder="0" value="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Closing Stock (Subtract)</label>
+                                    <input type="number" id="closingStock" placeholder="0" value="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Depreciation Link -->
+                        <div class="expense-category">
+                            <h4><span class="category-icon">4</span> Depreciation (From Calculator Below)</h4>
+                            <div class="success-box">
+                                Total Depreciation from Asset Register: <strong id="totalDepFromCalc">₹0</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="success-box" id="businessCalculation" style="margin-top: 15px;">
+                        <strong>Business/Profession Income:</strong> ₹0
+                    </div>
+                </div>
+            </div>
+
+            <!-- HEAD 4: CAPITAL GAINS -->
+            <div class="income-head-content" id="head-capital">
+                <div class="head-of-income">
+                    <h3>📈 Capital Gains (Section 45-55)</h3>
+
+                    <div class="expense-category">
+                        <h4>Short Term Capital Gains (STCG)</h4>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>STCG on Equity (Sec 111A) <span class="label-hint">@15%</span></label>
+                                <input type="number" id="stcg111A" placeholder="0" value="0">
+                                <span class="label-limit">Listed shares with STT paid</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Other STCG <span class="label-hint">@Normal Rates</span></label>
+                                <input type="number" id="stcgOther" placeholder="0" value="0">
+                                <span class="label-limit">Property, debt funds, unlisted shares</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="expense-category">
+                        <h4>Long Term Capital Gains (LTCG)</h4>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>LTCG on Equity (Sec 112A) <span class="label-hint">@10% above ₹1L</span></label>
+                                <input type="number" id="ltcg112A" placeholder="0" value="0">
+                                <span class="label-limit">Listed shares/equity MF with STT</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Other LTCG (Sec 112) <span class="label-hint">@20% with indexation</span></label>
+                                <input type="number" id="ltcgOther" placeholder="0" value="0">
+                                <span class="label-limit">Property, gold, debt funds</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="expense-category">
+                        <h4>Capital Loss (Set-off / Carry Forward)</h4>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Short Term Capital Loss</label>
+                                <input type="number" id="stcLoss" placeholder="0" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Long Term Capital Loss</label>
+                                <input type="number" id="ltcLoss" placeholder="0" value="0">
+                            </div>
+                        </div>
+                        <div class="info-box">
+                            STCL can be set off against both STCG & LTCG. LTCL can only be set off against LTCG. Carry forward for 8 years.
+                        </div>
+                    </div>
+
+                    <div class="success-box" id="capitalCalculation">
+                        <strong>Capital Gains:</strong> STCG (111A): ₹0 | Other STCG: ₹0 | LTCG (112A): ₹0 | Other LTCG: ₹0
+                    </div>
+                </div>
+            </div>
+
+            <!-- HEAD 5: OTHER SOURCES -->
+            <div class="income-head-content" id="head-other">
+                <div class="head-of-income">
+                    <h3>📋 Income from Other Sources (Section 56-59)</h3>
+
+                    <div class="expense-category">
+                        <h4>Interest Income</h4>
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label>Savings Bank Interest</label>
+                                <input type="number" id="interestSavings" placeholder="0" value="0">
+                                <span class="label-limit">Deduction u/s 80TTA: ₹10,000</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Fixed Deposit Interest</label>
+                                <input type="number" id="interestFD" placeholder="0" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Interest on Bonds/Debentures</label>
+                                <input type="number" id="interestBonds" placeholder="0" value="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="expense-category">
+                        <h4>Dividend Income</h4>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Dividend from Indian Companies</label>
+                                <input type="number" id="dividendIndian" placeholder="0" value="0">
+                                <span class="label-limit">Taxable in hands of shareholder</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Dividend from Foreign Companies</label>
+                                <input type="number" id="dividendForeign" placeholder="0" value="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="expense-category">
+                        <h4>Other Income</h4>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Rental Income (Other than House Property)</label>
+                                <input type="number" id="rentalOther" placeholder="0" value="0">
+                                <span class="label-limit">Plant, machinery, furniture</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Gifts Received (Above ₹50,000)</label>
+                                <input type="number" id="gifts" placeholder="0" value="0">
+                                <span class="label-limit">Except from relatives/marriage</span>
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Lottery / Gambling Winnings (Sec 115BB) <span class="label-hint">@30%</span></label>
+                                <input type="number" id="lottery" placeholder="0" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Any Other Income</label>
+                                <input type="number" id="anyOtherIncome" placeholder="0" value="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="success-box" id="otherCalculation">
+                        <strong>Other Sources Income:</strong> ₹0
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DEPRECIATION CALCULATOR -->
+        <div class="card">
+            <h2 class="card-title collapsible active" onclick="toggleSection('depCalcSection')">
+                🧮 Depreciation Calculator (Section 32)
+            </h2>
+            <div id="depCalcSection" class="section-content show">
+                <div class="info-box">
+                    💡 Add your assets to automatically calculate depreciation using WDV method. Depreciation is allowed under both Old & New tax regimes for business income.
+                </div>
+
+                <div class="expense-category">
+                    <h4>Add New Asset</h4>
+                    <div class="grid-5">
+                        <div class="form-group">
+                            <label>Asset Description</label>
+                            <input type="text" id="newAssetName" placeholder="e.g., Laptop">
+                        </div>
+                        <div class="form-group">
+                            <label>Asset Block</label>
+                            <select id="newAssetBlock">
+                                <option value="building5">Building (Residential) - 5%</option>
+                                <option value="building10">Building (Others) - 10%</option>
+                                <option value="furniture">Furniture & Fittings - 10%</option>
+                                <option value="plant15">Plant & Machinery - 15%</option>
+                                <option value="vehicle15">Motor Vehicles - 15%</option>
+                                <option value="vehicle30">Commercial Vehicles - 30%</option>
+                                <option value="computer" selected>Computers & Software - 40%</option>
+                                <option value="intangible">Intangible Assets - 25%</option>
+                                <option value="energy">Energy Saving Devices - 40%</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Purchase Date</label>
+                            <input type="date" id="newAssetDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Cost (₹)</label>
+                            <input type="number" id="newAssetCost" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-success btn-small" onclick="addAsset()" style="width:100%">+ Add Asset</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="expense-category">
+                    <h4>Asset Register & Depreciation Schedule</h4>
+                    <div style="overflow-x: auto;">
+                        <table class="asset-table" id="assetTable">
+                            <thead>
+                                <tr>
+                                    <th>Asset</th>
+                                    <th>Block</th>
+                                    <th>Rate</th>
+                                    <th>Purchase Date</th>
+                                    <th>Cost</th>
+                                    <th>Opening WDV</th>
+                                    <th>Depreciation</th>
+                                    <th>Closing WDV</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="assetTableBody">
+                                <tr><td colspan="9" style="text-align:center; color:#888;">No assets added yet. Add assets above to calculate depreciation.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="dep-summary">
+                    <h4 style="margin-bottom: 10px;">📊 Depreciation Summary for FY 2024-25</h4>
+                    <div class="dep-summary-item">
+                        <span>Opening WDV (All Blocks)</span>
+                        <span id="totalOpeningWDV">₹0</span>
+                    </div>
+                    <div class="dep-summary-item">
+                        <span>Additions During Year</span>
+                        <span id="totalAdditions">₹0</span>
+                    </div>
+                    <div class="dep-summary-item">
+                        <span>Sales/Disposals During Year</span>
+                        <span id="totalDisposals">₹0</span>
+                    </div>
+                    <div class="dep-summary-item">
+                        <span>Total Depreciation Allowable</span>
+                        <span id="totalDepreciation">₹0</span>
+                    </div>
+                    <div class="dep-summary-item">
+                        <span>Additional Depreciation (20%)</span>
+                        <span id="additionalDep">₹0</span>
+                    </div>
+                    <div class="dep-summary-item">
+                        <span><strong>Closing WDV (All Blocks)</strong></span>
+                        <span id="totalClosingWDV"><strong>₹0</strong></span>
+                    </div>
+                </div>
+
+                <!-- Depreciation Rates Reference -->
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-small btn-secondary" onclick="toggleDepRates()">View Depreciation Rates</button>
+                    <div id="depRatesTable" class="hidden" style="margin-top: 15px;">
+                        <table class="slabs-table">
+                            <thead>
+                                <tr><th>Block</th><th>Asset Type</th><th>Rate</th><th>Notes</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>I</td><td>Buildings (Residential)</td><td>5%</td><td>Mainly for residence</td></tr>
+                                <tr><td>I</td><td>Buildings (Others)</td><td>10%</td><td>Factory, godown, office</td></tr>
+                                <tr><td>II</td><td>Furniture & Fittings</td><td>10%</td><td>All furniture</td></tr>
+                                <tr><td>III</td><td>Plant & Machinery (General)</td><td>15%</td><td>Most equipment</td></tr>
+                                <tr><td>III</td><td>Motor Vehicles</td><td>15%</td><td>Cars, bikes</td></tr>
+                                <tr><td>III</td><td>Ships, Vessels</td><td>20%</td><td>-</td></tr>
+                                <tr><td>IV</td><td>Commercial Vehicles</td><td>30%</td><td>Buses, lorries for hire</td></tr>
+                                <tr><td>V</td><td>Computers & Software</td><td>40%</td><td>High depreciation</td></tr>
+                                <tr><td>VI</td><td>Intangible Assets</td><td>25%</td><td>Patents, copyrights, trademarks</td></tr>
+                                <tr><td>-</td><td>Energy Saving Devices</td><td>40%</td><td>Solar, windmills</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="warning-box" style="margin-top: 10px;">
+                            <strong>Half-Year Rule:</strong> If asset is used for less than 180 days in the year of purchase, only 50% depreciation is allowed.<br>
+                            <strong>Additional Depreciation:</strong> 20% on new plant & machinery for manufacturing (Sec 32(1)(iia))
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Continue in Part 2... Chapter VI-A Deductions -->
+        <div class="card">
+            <h2 class="card-title collapsible" onclick="toggleSection('chapterVIA')">
+                📋 Chapter VI-A Deductions
+            </h2>
+            <div id="chapterVIA" class="section-content">
+                <div class="info-box">
+                    💡 <strong>New Regime:</strong> Only Sec 80CCD(2) allowed. <strong>Old Regime:</strong> All deductions available.
+                </div>
+
+                <!-- 80C -->
+                <div class="expense-category">
+                    <h4>Section 80C/80CCC/80CCD(1) <span class="regime-badge badge-old">Old Regime</span></h4>
+                    <p class="label-hint" style="margin-bottom:10px;">Combined Limit: ₹1,50,000</p>
+                    <div class="grid-3">
+                        <div class="form-group">
+                            <label>PPF / EPF / VPF</label>
+                            <input type="number" id="ded80C_ppf" placeholder="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>ELSS Mutual Funds</label>
+                            <input type="number" id="ded80C_elss" placeholder="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Life Insurance Premium</label>
+                            <input type="number" id="ded80C_lic" placeholder="0" value="0">
+                        </div>
+                    </div>
+                    <div class="grid-3">
+                        <div class="form-group">
+                            <label>NSC / Tax Saver FD</label>
+                            <input type="number" id="ded80C_nsc" placeholder="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Home Loan Principal</label>
+                            <input type="number" id="ded80C_hlp" placeholder="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Children Tuition Fees</label>
+                            <input type="number" id="ded80C_tuition" placeholder="0" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 80CCD -->
+                <div class="expense-category">
+                    <h4>Section 80CCD - NPS</h4>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>80CCD(1B) - Self NPS <span class="regime-badge badge-old">Old Regime</span></label>
+                            <input type="number" id="ded80CCD1B" placeholder="0" value="0">
+                            <span class="label-limit">Additional ₹50,000 over 80C</span>
+                        </div>
+                        <div class="form-group">
+                            <label>80CCD(2) - Employer NPS <span class="regime-badge badge-both">Both Regimes</span></label>
+                            <input type="number" id="ded80CCD2" placeholder="0" value="0">
+                            <span class="label-limit">14% (Govt) / 10% (Others) of salary</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 80D -->
+                <div class="expense-category">
+                    <h4>Section 80D - Health Insurance <span class="regime-badge badge-old">Old Regime</span></h4>
+                    <div class="grid-3">
+                        <div class="form-group">
+                            <label>Self & Family Premium</label>
+                            <input type="number" id="ded80D_self" placeholder="0" value="0">
+                            <span class="label-limit">Max ₹25,000 (₹50,000 if senior)</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Parents Premium</label>
+                            <input type="number" id="ded80D_parents" placeholder="0" value="0">
+                            <span class="label-limit">Max ₹25,000 (₹50,000 if senior)</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Preventive Health Checkup</label>
+                            <input type="number" id="ded80D_checkup" placeholder="0" value="0">
+                            <span class="label-limit">Max ₹5,000 (within 80D limit)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other Deductions -->
+                <div class="expense-category">
+                    <h4>Other Deductions <span class="regime-badge badge-old">Old Regime</span></h4>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>80E - Education Loan Interest</label>
+                            <input type="number" id="ded80E" placeholder="0" value="0">
+                            <span class="label-limit">No limit, max 8 years</span>
+                        </div>
+                        <div class="form-group">
+                            <label>80G - Donations</label>
+                            <input type="number" id="ded80G" placeholder="0" value="0">
+                            <span class="label-limit">50-100% based on institution</span>
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>80TTA/80TTB - Savings Interest</label>
+                            <input type="number" id="ded80TTA" placeholder="0" value="0">
+                            <span class="label-limit">₹10,000 (₹50,000 for seniors)</span>
+                        </div>
+                        <div class="form-group">
+                            <label>80DD/80U - Disability</label>
+                            <input type="number" id="ded80DD" placeholder="0" value="0">
+                            <span class="label-limit">₹75,000 / ₹1,25,000 (severe)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CALCULATE BUTTON -->
+        <button class="btn btn-full" onclick="calculateTax()">🧮 Calculate & Compare Tax</button>
+
+        <!-- RESULTS -->
+        <div class="results" id="results">
+            <div class="card">
+                <h2 class="card-title">📊 Tax Computation Results</h2>
+
+                <!-- Income Summary -->
+                <div class="expense-category" style="margin-bottom: 20px;">
+                    <h4>Gross Total Income (All Heads)</h4>
+                    <table class="slabs-table" id="incomeSummaryTable">
+                        <tr><td>Salary Income</td><td id="res_salary">₹0</td></tr>
+                        <tr><td>House Property Income</td><td id="res_house">₹0</td></tr>
+                        <tr><td>Business/Profession Income</td><td id="res_business">₹0</td></tr>
+                        <tr><td>Capital Gains (Normal Rate)</td><td id="res_capital_normal">₹0</td></tr>
+                        <tr><td>Other Sources Income</td><td id="res_other">₹0</td></tr>
+                        <tr style="font-weight:bold; background:#e8f5e9;"><td>Gross Total Income</td><td id="res_gti">₹0</td></tr>
+                    </table>
+                </div>
+
+                <div class="comparison">
+                    <div class="regime-card" id="newRegimeCard">
+                        <h3 class="regime-title">New Tax Regime (Default)</h3>
+                        <div class="tax-amount" id="newTaxAmount">₹0</div>
+                        <div class="tax-label">Total Tax Payable</div>
+                        <div class="breakdown" id="newBreakdown"></div>
+                    </div>
+
+                    <div class="regime-card" id="oldRegimeCard">
+                        <h3 class="regime-title">Old Tax Regime</h3>
+                        <div class="tax-amount" id="oldTaxAmount">₹0</div>
+                        <div class="tax-label">Total Tax Payable</div>
+                        <div class="breakdown" id="oldBreakdown"></div>
+                    </div>
+                </div>
+
+                <div class="savings-banner" id="savingsBanner">
+                    <div class="savings-amount" id="savingsAmount">₹0</div>
+                    <div id="savingsText">You save by choosing the recommended regime</div>
+                </div>
+            </div>
+
+            <div class="disclaimer">
+                <strong>Disclaimer:</strong> This calculator provides estimates based on Income Tax Act FY 2024-25.
+                Consult a qualified CA for accurate filing. Special rates apply for Capital Gains and Lottery income.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global Variables
+        let currentAssesseeType = 'individual';
+        let currentIncomeHead = 'salary';
+        let assets = [];
+        let propertyCount = 1;
+
+        const depRates = {
+            'building5': { name: 'Building (Residential)', rate: 0.05 },
+            'building10': { name: 'Building (Others)', rate: 0.10 },
+            'furniture': { name: 'Furniture & Fittings', rate: 0.10 },
+            'plant15': { name: 'Plant & Machinery', rate: 0.15 },
+            'vehicle15': { name: 'Motor Vehicles', rate: 0.15 },
+            'vehicle30': { name: 'Commercial Vehicles', rate: 0.30 },
+            'computer': { name: 'Computers & Software', rate: 0.40 },
+            'intangible': { name: 'Intangible Assets', rate: 0.25 },
+            'energy': { name: 'Energy Saving Devices', rate: 0.40 }
+        };
+
+        // Utility Functions
+        function formatCurrency(amount) {
+            return '₹' + Math.round(amount).toLocaleString('en-IN');
+        }
+
+        function getVal(id) {
+            const el = document.getElementById(id);
+            return el ? (parseFloat(el.value) || 0) : 0;
+        }
+
+        function toggleSection(sectionId) {
+            const content = document.getElementById(sectionId);
+            const header = content.previousElementSibling;
+            content.classList.toggle('show');
+            header.classList.toggle('active');
+        }
+
+        function toggleDepRates() {
+            document.getElementById('depRatesTable').classList.toggle('hidden');
+        }
+
+        // Assessee Type Switch
+        function switchAssesseeType(type) {
+            currentAssesseeType = type;
+            document.querySelectorAll('.tab-container .tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Show/hide age group based on assessee type
+            const ageGroup = document.getElementById('ageGroup').parentElement;
+            if (type === 'individual') {
+                ageGroup.classList.remove('hidden');
+            } else {
+                ageGroup.classList.add('hidden');
+            }
+        }
+
+        // Income Head Tabs
+        function switchIncomeHead(head) {
+            currentIncomeHead = head;
+            document.querySelectorAll('.income-head-tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById('tab-' + head).classList.add('active');
+
+            document.querySelectorAll('.income-head-content').forEach(content => content.classList.remove('active'));
+            document.getElementById('head-' + head).classList.add('active');
+        }
+
+        // SALARY CALCULATIONS
+        function calculateSalaryIncome() {
+            const basic = getVal('basicSalary');
+            const da = getVal('da');
+            const hraReceived = getVal('hra');
+            const actualRent = getVal('actualRent');
+            const cityType = document.getElementById('cityType').value;
+            const lta = getVal('lta');
+            const special = getVal('specialAllowance');
+            const bonus = getVal('salaryBonus');
+            const perks = getVal('perquisites');
+
+            // HRA Exemption Calculation
+            const basicPlusDa = basic + da;
+            const cityPercent = cityType === 'metro' ? 0.50 : 0.40;
+            const hraExempt1 = hraReceived;
+            const hraExempt2 = basicPlusDa * cityPercent;
+            const hraExempt3 = Math.max(0, actualRent - (basicPlusDa * 0.10));
+            const hraExemption = Math.min(hraExempt1, hraExempt2, hraExempt3);
+
+            const grossSalary = basic + da + hraReceived + lta + special + bonus + perks;
+            const netTaxableSalary = grossSalary - hraExemption;
+
+            document.getElementById('salaryCalculation').innerHTML = `
+                <strong>Salary Income Summary:</strong><br>
+                Gross Salary: ${formatCurrency(grossSalary)} | HRA Exemption: ${formatCurrency(hraExemption)} |
+                <strong>Net Taxable Salary: ${formatCurrency(netTaxableSalary)}</strong>
+            `;
+
+            return { gross: grossSalary, hraExemption, net: netTaxableSalary };
+        }
+
+        // HOUSE PROPERTY CALCULATIONS
+        function calculateHouseIncome() {
+            let totalHouseIncome = 0;
+            let totalStdDeduction = 0;
+            let totalInterestDeduction = 0;
+
+            document.querySelectorAll('[id^="property-"]').forEach(prop => {
+                const type = prop.querySelector('.propertyType').value;
+                const rent = parseFloat(prop.querySelector('.annualRent').value) || 0;
+                const municipal = parseFloat(prop.querySelector('.municipalTax').value) || 0;
+                const interest = parseFloat(prop.querySelector('.homeLoanInterest').value) || 0;
+
+                let gav = 0, nav = 0, stdDed = 0, intDed = 0, income = 0;
+
+                if (type === 'selfoccupied') {
+                    // Self-occupied: GAV = 0, Interest max 2L
+                    intDed = Math.min(interest, 200000);
+                    income = -intDed;
+                } else {
+                    // Let out / Deemed let out
+                    gav = rent;
+                    nav = gav - municipal;
+                    stdDed = nav * 0.30;
+                    intDed = interest; // No limit for let out
+                    income = nav - stdDed - intDed;
+                }
+
+                totalHouseIncome += income;
+                totalStdDeduction += stdDed;
+                totalInterestDeduction += intDed;
+            });
+
+            document.getElementById('houseCalculation').innerHTML = `
+                <strong>House Property Income:</strong> ${formatCurrency(totalHouseIncome)} |
+                Standard Deduction (30%): ${formatCurrency(totalStdDeduction)} |
+                Interest Deduction: ${formatCurrency(totalInterestDeduction)}
+            `;
+
+            return totalHouseIncome;
+        }
+
+        function addProperty() {
+            propertyCount++;
+            const container = document.getElementById('houseProperties');
+            const newProp = document.createElement('div');
+            newProp.className = 'expense-category';
+            newProp.id = `property-${propertyCount}`;
+            newProp.innerHTML = `
+                <h4>Property ${propertyCount} <button class="btn btn-small btn-danger" onclick="removeProperty(${propertyCount})" style="margin-left:10px;">Remove</button></h4>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Property Type</label>
+                        <select class="propertyType" onchange="calculateHouseIncome()">
+                            <option value="selfoccupied">Self-Occupied</option>
+                            <option value="letout">Let Out</option>
+                            <option value="deemed">Deemed Let Out</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Annual Rent Received</label>
+                        <input type="number" class="annualRent" placeholder="0" value="0" onchange="calculateHouseIncome()">
+                    </div>
+                </div>
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>Municipal Taxes Paid</label>
+                        <input type="number" class="municipalTax" placeholder="0" value="0" onchange="calculateHouseIncome()">
+                    </div>
+                    <div class="form-group">
+                        <label>Home Loan Interest</label>
+                        <input type="number" class="homeLoanInterest" placeholder="0" value="0" onchange="calculateHouseIncome()">
+                    </div>
+                    <div class="form-group">
+                        <label>Pre-construction Interest</label>
+                        <input type="number" class="preConstructionInt" placeholder="0" value="0">
+                    </div>
+                </div>
+            `;
+            container.appendChild(newProp);
+        }
+
+        function removeProperty(id) {
+            document.getElementById(`property-${id}`).remove();
+            calculateHouseIncome();
+        }
+
+        // BUSINESS INCOME SECTIONS
+        function toggleBusinessSections() {
+            const type = document.getElementById('businessType').value;
+            document.getElementById('section44AD').classList.add('hidden');
+            document.getElementById('section44ADA').classList.add('hidden');
+            document.getElementById('section44AE').classList.add('hidden');
+            document.getElementById('sectionRegularBusiness').classList.add('hidden');
+
+            if (type === 'presumptive44AD') document.getElementById('section44AD').classList.remove('hidden');
+            else if (type === 'presumptive44ADA') document.getElementById('section44ADA').classList.remove('hidden');
+            else if (type === 'presumptive44AE') document.getElementById('section44AE').classList.remove('hidden');
+            else if (type === 'regular') document.getElementById('sectionRegularBusiness').classList.remove('hidden');
+        }
+
+        function calculate44AD() {
+            const turnover = getVal('turnover44AD');
+            const digital = getVal('digital44AD');
+            const cash = turnover - digital;
+            const profit = (digital * 0.06) + (cash * 0.08);
+            document.getElementById('calc44AD').innerHTML = `Deemed Profit: ${formatCurrency(profit)} (Digital: ${formatCurrency(digital)} × 6% + Cash: ${formatCurrency(cash)} × 8%)`;
+            return profit;
+        }
+
+        function calculate44ADA() {
+            const receipts = getVal('receipts44ADA');
+            const profit = receipts * 0.50;
+            document.getElementById('calc44ADA').innerHTML = `Deemed Profit (50%): ${formatCurrency(profit)}`;
+            return profit;
+        }
+
+        function calculate44AE() {
+            const heavy = getVal('heavyVehicles');
+            const other = getVal('otherVehicles');
+            const profit = (heavy * 7500 * 12) + (other * 7500 * 12);
+            document.getElementById('calc44AE').innerHTML = `Deemed Profit: ${formatCurrency(profit)} (${heavy + other} vehicles × ₹7,500 × 12 months)`;
+            return profit;
+        }
+
+        // DEPRECIATION CALCULATOR
+        function addAsset() {
+            const name = document.getElementById('newAssetName').value;
+            const block = document.getElementById('newAssetBlock').value;
+            const dateStr = document.getElementById('newAssetDate').value;
+            const cost = parseFloat(document.getElementById('newAssetCost').value) || 0;
+
+            if (!name || !dateStr || cost <= 0) {
+                alert('Please fill all asset details');
+                return;
+            }
+
+            const purchaseDate = new Date(dateStr);
+            const fyStart = new Date('2024-04-01');
+            const fyEnd = new Date('2025-03-31');
+            const halfYearDate = new Date('2024-10-03'); // 180 days from April 1
+
+            // Calculate depreciation
+            let openingWDV = 0;
+            let currentYearAddition = 0;
+            let depRate = depRates[block].rate;
+            let depreciation = 0;
+
+            if (purchaseDate < fyStart) {
+                // Asset purchased before this FY - calculate accumulated dep
+                const yearsSincePurchase = Math.floor((fyStart - purchaseDate) / (365.25 * 24 * 60 * 60 * 1000));
+                openingWDV = cost * Math.pow(1 - depRate, yearsSincePurchase);
+                depreciation = openingWDV * depRate;
+            } else if (purchaseDate >= fyStart && purchaseDate <= fyEnd) {
+                // Asset purchased in current FY
+                currentYearAddition = cost;
+                openingWDV = 0;
+
+                // Half year rule
+                if (purchaseDate > halfYearDate) {
+                    depreciation = cost * depRate * 0.5;
+                } else {
+                    depreciation = cost * depRate;
+                }
+            }
+
+            const closingWDV = (openingWDV + currentYearAddition) - depreciation;
+
+            const asset = {
+                id: Date.now(),
+                name,
+                block,
+                blockName: depRates[block].name,
+                rate: depRate,
+                purchaseDate: dateStr,
+                cost,
+                openingWDV,
+                depreciation,
+                closingWDV,
+                isCurrentYear: purchaseDate >= fyStart && purchaseDate <= fyEnd
+            };
+
+            assets.push(asset);
+            renderAssetTable();
+            updateDepreciationSummary();
+
+            // Clear inputs
+            document.getElementById('newAssetName').value = '';
+            document.getElementById('newAssetCost').value = '';
+        }
+
+        function removeAsset(id) {
+            assets = assets.filter(a => a.id !== id);
+            renderAssetTable();
+            updateDepreciationSummary();
+        }
+
+        function renderAssetTable() {
+            const tbody = document.getElementById('assetTableBody');
+            if (assets.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:#888;">No assets added yet.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = assets.map(a => `
+                <tr>
+                    <td>${a.name}</td>
+                    <td>${a.blockName}</td>
+                    <td>${(a.rate * 100).toFixed(0)}%</td>
+                    <td>${a.purchaseDate}</td>
+                    <td>${formatCurrency(a.cost)}</td>
+                    <td>${formatCurrency(a.openingWDV)}</td>
+                    <td>${formatCurrency(a.depreciation)}</td>
+                    <td>${formatCurrency(a.closingWDV)}</td>
+                    <td><button class="btn btn-small btn-danger" onclick="removeAsset(${a.id})">×</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function updateDepreciationSummary() {
+            const totalOpening = assets.reduce((sum, a) => sum + a.openingWDV, 0);
+            const totalAdditions = assets.filter(a => a.isCurrentYear).reduce((sum, a) => sum + a.cost, 0);
+            const totalDep = assets.reduce((sum, a) => sum + a.depreciation, 0);
+            const totalClosing = assets.reduce((sum, a) => sum + a.closingWDV, 0);
+
+            document.getElementById('totalOpeningWDV').textContent = formatCurrency(totalOpening);
+            document.getElementById('totalAdditions').textContent = formatCurrency(totalAdditions);
+            document.getElementById('totalDisposals').textContent = '₹0';
+            document.getElementById('totalDepreciation').textContent = formatCurrency(totalDep);
+            document.getElementById('additionalDep').textContent = '₹0';
+            document.getElementById('totalClosingWDV').innerHTML = `<strong>${formatCurrency(totalClosing)}</strong>`;
+            document.getElementById('totalDepFromCalc').textContent = formatCurrency(totalDep);
+        }
+
+        // TAX CALCULATION
+        function calculateNewRegimeTax(income) {
+            let tax = 0;
+            if (income <= 300000) tax = 0;
+            else if (income <= 700000) tax = (income - 300000) * 0.05;
+            else if (income <= 1000000) tax = 20000 + (income - 700000) * 0.10;
+            else if (income <= 1200000) tax = 50000 + (income - 1000000) * 0.15;
+            else if (income <= 1500000) tax = 80000 + (income - 1200000) * 0.20;
+            else tax = 140000 + (income - 1500000) * 0.30;
+
+            // Rebate u/s 87A
+            if (income <= 700000) tax = 0;
+            return tax;
+        }
+
+        function calculateOldRegimeTax(income, ageGroup) {
+            let exemption = 250000;
+            if (ageGroup === 'senior') exemption = 300000;
+            else if (ageGroup === 'supersenior') exemption = 500000;
+
+            let tax = 0;
+            if (income <= exemption) tax = 0;
+            else if (income <= 500000) tax = (income - exemption) * 0.05;
+            else if (income <= 1000000) tax = (500000 - exemption) * 0.05 + (income - 500000) * 0.20;
+            else tax = (500000 - exemption) * 0.05 + 500000 * 0.20 + (income - 1000000) * 0.30;
+
+            // Rebate
+            if (income <= 500000) tax = Math.max(0, tax - 12500);
+            return tax;
+        }
+
+        function calculateTax() {
+            const ageGroup = document.getElementById('ageGroup').value;
+
+            // 1. Salary Income
+            const salaryData = calculateSalaryIncome();
+            const salaryIncome = salaryData.net;
+
+            // 2. House Property
+            const houseIncome = calculateHouseIncome();
+
+            // 3. Business Income
+            let businessIncome = 0;
+            const bizType = document.getElementById('businessType').value;
+            if (bizType === 'presumptive44AD') businessIncome = calculate44AD();
+            else if (bizType === 'presumptive44ADA') businessIncome = calculate44ADA();
+            else if (bizType === 'presumptive44AE') businessIncome = calculate44AE();
+            else if (bizType === 'regular') {
+                const gross = getVal('grossReceipts') + getVal('otherBusinessIncome');
+                const cogs = getVal('openingStock') + getVal('purchases') + getVal('directExpenses') - getVal('closingStock');
+                const expenses = getVal('expRent') + getVal('expRepairs') + getVal('expInsurance') + getVal('expSalaries') +
+                    getVal('expInterest') + getVal('expBadDebts') + getVal('expEmployerPF') + getVal('expGratuity') + getVal('expOther');
+                const weighted = getVal('expResearchInhouse') + getVal('expResearchApproved') + getVal('expResearchCapital') +
+                    getVal('exp35AD') + getVal('expSkillDev') + getVal('expAgriExtension');
+                const depreciation = assets.reduce((sum, a) => sum + a.depreciation, 0);
+                businessIncome = gross - cogs - expenses - weighted - depreciation;
+            }
+            document.getElementById('businessCalculation').innerHTML = `<strong>Business/Profession Income:</strong> ${formatCurrency(businessIncome)}`;
+
+            // 4. Capital Gains
+            const stcg111A = getVal('stcg111A');
+            const stcgOther = getVal('stcgOther');
+            const ltcg112A = Math.max(0, getVal('ltcg112A') - 100000); // 1L exemption
+            const ltcgOther = getVal('ltcgOther');
+            const capitalNormal = stcgOther; // Taxed at normal rates
+            document.getElementById('capitalCalculation').innerHTML = `
+                <strong>Capital Gains:</strong> STCG (111A): ${formatCurrency(stcg111A)} @15% |
+                Other STCG: ${formatCurrency(stcgOther)} | LTCG (112A): ${formatCurrency(ltcg112A)} @10% |
+                Other LTCG: ${formatCurrency(ltcgOther)} @20%
+            `;
+
+            // 5. Other Sources
+            const otherIncome = getVal('interestSavings') + getVal('interestFD') + getVal('interestBonds') +
+                getVal('dividendIndian') + getVal('dividendForeign') + getVal('rentalOther') + getVal('gifts') + getVal('anyOtherIncome');
+            const lottery = getVal('lottery');
+            document.getElementById('otherCalculation').innerHTML = `<strong>Other Sources Income:</strong> ${formatCurrency(otherIncome + lottery)}`;
+
+            // Gross Total Income (excluding special rate items)
+            const gti = salaryIncome + Math.max(-200000, houseIncome) + businessIncome + capitalNormal + otherIncome;
+
+            // Update summary table
+            document.getElementById('res_salary').textContent = formatCurrency(salaryIncome);
+            document.getElementById('res_house').textContent = formatCurrency(houseIncome);
+            document.getElementById('res_business').textContent = formatCurrency(businessIncome);
+            document.getElementById('res_capital_normal').textContent = formatCurrency(capitalNormal);
+            document.getElementById('res_other').textContent = formatCurrency(otherIncome);
+            document.getElementById('res_gti').textContent = formatCurrency(gti);
+
+            // Deductions
+            const stdDeductionNew = 75000;
+            const stdDeductionOld = 50000;
+
+            const ded80C = Math.min(getVal('ded80C_ppf') + getVal('ded80C_elss') + getVal('ded80C_lic') + getVal('ded80C_nsc') + getVal('ded80C_hlp') + getVal('ded80C_tuition'), 150000);
+            const ded80CCD1B = Math.min(getVal('ded80CCD1B'), 50000);
+            const ded80CCD2 = getVal('ded80CCD2');
+            const ded80D = Math.min(getVal('ded80D_self'), ageGroup !== 'general' ? 50000 : 25000) +
+                Math.min(getVal('ded80D_parents'), 50000) + Math.min(getVal('ded80D_checkup'), 5000);
+            const ded80E = getVal('ded80E');
+            const ded80G = getVal('ded80G') * 0.5;
+            const ded80TTA = Math.min(getVal('ded80TTA'), ageGroup !== 'general' ? 50000 : 10000);
+            const ded80DD = getVal('ded80DD');
+
+            const totalDedOld = ded80C + ded80CCD1B + ded80CCD2 + ded80D + ded80E + ded80G + ded80TTA + ded80DD;
+            const totalDedNew = ded80CCD2; // Only employer NPS
+
+            // Taxable Income
+            const taxableNew = Math.max(0, gti - stdDeductionNew - totalDedNew);
+            const taxableOld = Math.max(0, gti - stdDeductionOld - totalDedOld);
+
+            // Tax on Normal Income
+            let newTax = calculateNewRegimeTax(taxableNew);
+            let oldTax = calculateOldRegimeTax(taxableOld, ageGroup);
+
+            // Add Special Rate Taxes
+            const stcg111ATax = stcg111A * 0.15;
+            const ltcg112ATax = ltcg112A * 0.10;
+            const ltcgOtherTax = ltcgOther * 0.20;
+            const lotteryTax = lottery * 0.30;
+
+            newTax += stcg111ATax + ltcg112ATax + ltcgOtherTax + lotteryTax;
+            oldTax += stcg111ATax + ltcg112ATax + ltcgOtherTax + lotteryTax;
+
+            // Surcharge & Cess
+            const newSurcharge = taxableNew > 5000000 ? newTax * 0.10 : 0;
+            const oldSurcharge = taxableOld > 5000000 ? oldTax * 0.10 : 0;
+            const newCess = (newTax + newSurcharge) * 0.04;
+            const oldCess = (oldTax + oldSurcharge) * 0.04;
+
+            const totalNewTax = newTax + newSurcharge + newCess;
+            const totalOldTax = oldTax + oldSurcharge + oldCess;
+
+            // Display Results
+            document.getElementById('results').classList.add('show');
+
+            document.getElementById('newTaxAmount').textContent = formatCurrency(totalNewTax);
+            document.getElementById('newBreakdown').innerHTML = `
+                <div class="breakdown-item"><span>GTI</span><span>${formatCurrency(gti)}</span></div>
+                <div class="breakdown-item"><span>Std Deduction</span><span>-${formatCurrency(stdDeductionNew)}</span></div>
+                <div class="breakdown-item"><span>80CCD(2)</span><span>-${formatCurrency(ded80CCD2)}</span></div>
+                <div class="breakdown-item"><span>Taxable Income</span><span>${formatCurrency(taxableNew)}</span></div>
+                <div class="breakdown-item"><span>Tax on Normal</span><span>${formatCurrency(newTax - stcg111ATax - ltcg112ATax - ltcgOtherTax - lotteryTax)}</span></div>
+                <div class="breakdown-item"><span>Tax on STCG 111A</span><span>${formatCurrency(stcg111ATax)}</span></div>
+                <div class="breakdown-item"><span>Tax on LTCG</span><span>${formatCurrency(ltcg112ATax + ltcgOtherTax)}</span></div>
+                <div class="breakdown-item"><span>Cess (4%)</span><span>${formatCurrency(newCess)}</span></div>
+                <div class="breakdown-item" style="font-weight:600;border-top:1px solid #999;padding-top:8px;"><span>Effective Rate</span><span>${((totalNewTax / gti) * 100).toFixed(2)}%</span></div>
+            `;
+
+            document.getElementById('oldTaxAmount').textContent = formatCurrency(totalOldTax);
+            document.getElementById('oldBreakdown').innerHTML = `
+                <div class="breakdown-item"><span>GTI</span><span>${formatCurrency(gti)}</span></div>
+                <div class="breakdown-item"><span>Std Deduction</span><span>-${formatCurrency(stdDeductionOld)}</span></div>
+                <div class="breakdown-item"><span>Chapter VI-A</span><span>-${formatCurrency(totalDedOld)}</span></div>
+                <div class="breakdown-item"><span>Taxable Income</span><span>${formatCurrency(taxableOld)}</span></div>
+                <div class="breakdown-item"><span>Tax on Normal</span><span>${formatCurrency(oldTax - stcg111ATax - ltcg112ATax - ltcgOtherTax - lotteryTax)}</span></div>
+                <div class="breakdown-item"><span>Tax on STCG 111A</span><span>${formatCurrency(stcg111ATax)}</span></div>
+                <div class="breakdown-item"><span>Tax on LTCG</span><span>${formatCurrency(ltcg112ATax + ltcgOtherTax)}</span></div>
+                <div class="breakdown-item"><span>Cess (4%)</span><span>${formatCurrency(oldCess)}</span></div>
+                <div class="breakdown-item" style="font-weight:600;border-top:1px solid #999;padding-top:8px;"><span>Effective Rate</span><span>${((totalOldTax / gti) * 100).toFixed(2)}%</span></div>
+            `;
+
+            // Recommendation
+            const newCard = document.getElementById('newRegimeCard');
+            const oldCard = document.getElementById('oldRegimeCard');
+            newCard.classList.remove('recommended');
+            oldCard.classList.remove('recommended');
+
+            const savings = Math.abs(totalNewTax - totalOldTax);
+            if (totalNewTax <= totalOldTax) {
+                newCard.classList.add('recommended');
+                document.getElementById('savingsAmount').textContent = formatCurrency(savings);
+                document.getElementById('savingsText').textContent = 'You save by choosing New Tax Regime';
+                document.getElementById('savingsBanner').style.background = 'linear-gradient(135deg, #4caf50 0%, #388e3c 100%)';
+            } else {
+                oldCard.classList.add('recommended');
+                document.getElementById('savingsAmount').textContent = formatCurrency(savings);
+                document.getElementById('savingsText').textContent = 'You save by choosing Old Tax Regime';
+                document.getElementById('savingsBanner').style.background = 'linear-gradient(135deg, #2196f3 0%, #1976d2 100%)';
+            }
+
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('newAssetDate').valueAsDate = new Date();
+        });
+    </script>
+</body>
+</html>
