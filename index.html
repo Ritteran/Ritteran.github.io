@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Indian Income Tax Calculator FY 2024-25 | Complete ITR Tool</title>
+    <meta name="description" content="Free Indian Income Tax Calculator with LTCG Indexation Tool, Depreciation Calculator, Surcharge & Marginal Relief. Budget 2024 updated rates.">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -36,6 +37,7 @@
         .label-hint { font-weight: normal; color: #888; font-size: 0.8rem; }
         .label-limit { font-weight: normal; color: #e65100; font-size: 0.75rem; display: block; margin-top: 2px; }
         .weight-badge { background: #4caf50; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 5px; }
+        .rate-badge { background: #ff5722; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 5px; }
         input[type="number"], input[type="date"], input[type="text"], select {
             width: 100%;
             padding: 12px 15px;
@@ -67,6 +69,7 @@
         .btn-success { background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%); }
         .btn-danger { background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); }
         .btn-secondary { background: linear-gradient(135deg, #607d8b 0%, #455a64 100%); }
+        .btn-warning { background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); }
         .results { display: none; }
         .results.show { display: block; }
         .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
@@ -104,6 +107,7 @@
         .info-box { background: #e3f2fd; border: 1px solid #2196f3; border-radius: 8px; padding: 12px; margin: 10px 0; font-size: 0.85rem; color: #1565c0; }
         .warning-box { background: #fff3e0; border: 1px solid #ff9800; border-radius: 8px; padding: 12px; margin: 10px 0; font-size: 0.85rem; color: #e65100; }
         .success-box { background: #e8f5e9; border: 1px solid #4caf50; border-radius: 8px; padding: 12px; margin: 10px 0; font-size: 0.85rem; color: #2e7d32; }
+        .update-box { background: #fce4ec; border: 1px solid #e91e63; border-radius: 8px; padding: 12px; margin: 10px 0; font-size: 0.85rem; color: #c2185b; }
         .collapsible { cursor: pointer; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
         .collapsible::after { content: '+'; font-size: 1.2rem; font-weight: bold; color: #4a90d9; }
         .collapsible.active::after { content: '-'; }
@@ -132,13 +136,14 @@
         .head-of-income h3 { color: #1a1a2e; font-size: 1rem; margin-bottom: 10px; }
         .hidden { display: none !important; }
 
-        /* Depreciation Calculator Styles */
-        .asset-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
-        .asset-table th, .asset-table td { padding: 10px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+        /* Tables */
+        .asset-table, .slabs-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
+        .asset-table th, .asset-table td, .slabs-table th, .slabs-table td { padding: 10px; text-align: left; border-bottom: 1px solid #e0e0e0; }
         .asset-table th { background: #1a1a2e; color: white; }
-        .asset-table tr:nth-child(even) { background: #f8f9fa; }
+        .slabs-table th { background: #f5f5f5; font-weight: 600; }
+        .asset-table tr:nth-child(even), .slabs-table tr:nth-child(even) { background: #f8f9fa; }
         .asset-table tr:hover { background: #e3f2fd; }
-        .asset-row-actions { display: flex; gap: 5px; }
+
         .dep-summary { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-radius: 10px; padding: 15px; margin-top: 15px; }
         .dep-summary-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #81c784; }
         .dep-summary-item:last-child { border-bottom: none; font-weight: 600; }
@@ -156,48 +161,36 @@
         }
         .income-head-tab:hover { background: #e3f2fd; }
         .income-head-tab.active { background: #4a90d9; color: white; border-color: #4a90d9; }
-        .income-head-tab.has-value { border-color: #4caf50; }
         .income-head-content { display: none; }
         .income-head-content.active { display: block; }
 
-        /* Toggle Switch */
-        .toggle-switch { position: relative; display: inline-block; width: 50px; height: 26px; margin-left: 10px; }
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 26px;
-        }
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 20px; width: 20px;
-            left: 3px; bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .toggle-slider { background-color: #4caf50; }
-        input:checked + .toggle-slider:before { transform: translateX(24px); }
-
-        .slabs-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
-        .slabs-table th, .slabs-table td { padding: 10px; text-align: left; border-bottom: 1px solid #e0e0e0; }
-        .slabs-table th { background: #f5f5f5; font-weight: 600; }
+        /* Indexation Calculator */
+        .indexation-result { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border: 2px solid #ffc107; border-radius: 12px; padding: 20px; margin-top: 15px; }
+        .indexation-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        @media (max-width: 600px) { .indexation-comparison { grid-template-columns: 1fr; } }
+        .indexation-option { background: white; border-radius: 10px; padding: 15px; text-align: center; }
+        .indexation-option.better { border: 3px solid #4caf50; background: #e8f5e9; }
+        .indexation-option h5 { margin-bottom: 10px; color: #1a1a2e; }
+        .indexation-option .tax-value { font-size: 1.5rem; font-weight: 700; color: #1a1a2e; }
+        .indexation-option .tax-savings { color: #4caf50; font-weight: 600; margin-top: 5px; }
 
         .disclaimer { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 15px; margin-top: 20px; font-size: 0.85rem; color: #856404; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🧾 Indian Income Tax Calculator</h1>
-        <p class="subtitle">FY 2024-25 (AY 2025-26) | All Heads of Income | Depreciation Calculator | Weighted Deductions</p>
+        <h1>Indian Income Tax Calculator</h1>
+        <p class="subtitle">FY 2024-25 (AY 2025-26) | Budget 2024 Updated Rates | LTCG Indexation Tool | Surcharge Calculator</p>
+
+        <!-- Budget 2024 Update Notice -->
+        <div class="update-box">
+            <strong>Budget 2024 Updates (Effective 23 July 2024):</strong><br>
+            STCG on Equity: 15% → <strong>20%</strong> | LTCG on Equity: 10% → <strong>12.5%</strong> (Exemption: ₹1L → <strong>₹1.25L</strong>) | Other LTCG: 20% with indexation → <strong>12.5% without indexation</strong>
+        </div>
 
         <!-- Assessee Category Selection -->
         <div class="card">
-            <h2 class="card-title">👤 Select Assessee Category</h2>
+            <h2 class="card-title">Select Assessee Category</h2>
             <div class="tab-container">
                 <button class="tab-btn active" onclick="switchAssesseeType('individual')">Individual</button>
                 <button class="tab-btn" onclick="switchAssesseeType('huf')">HUF</button>
@@ -218,7 +211,6 @@
                     <label>Financial Year</label>
                     <select id="financialYear">
                         <option value="2024-25" selected>FY 2024-25 (AY 2025-26)</option>
-                        <option value="2023-24">FY 2023-24 (AY 2024-25)</option>
                     </select>
                 </div>
             </div>
@@ -226,23 +218,23 @@
 
         <!-- HEADS OF INCOME -->
         <div class="card">
-            <h2 class="card-title">📊 Heads of Income</h2>
+            <h2 class="card-title">Heads of Income</h2>
             <div class="info-box">
-                💡 Income Tax Act categorizes income under 5 heads. Click each tab to enter income/loss under that head.
+                Income Tax Act categorizes income under 5 heads. Click each tab to enter income/loss under that head.
             </div>
 
             <div class="income-head-tabs">
-                <div class="income-head-tab active" onclick="switchIncomeHead('salary')" id="tab-salary">💰 Salary</div>
-                <div class="income-head-tab" onclick="switchIncomeHead('house')" id="tab-house">🏠 House Property</div>
-                <div class="income-head-tab" onclick="switchIncomeHead('business')" id="tab-business">💼 Business/Profession</div>
-                <div class="income-head-tab" onclick="switchIncomeHead('capital')" id="tab-capital">📈 Capital Gains</div>
-                <div class="income-head-tab" onclick="switchIncomeHead('other')" id="tab-other">📋 Other Sources</div>
+                <div class="income-head-tab active" onclick="switchIncomeHead('salary')" id="tab-salary">Salary</div>
+                <div class="income-head-tab" onclick="switchIncomeHead('house')" id="tab-house">House Property</div>
+                <div class="income-head-tab" onclick="switchIncomeHead('business')" id="tab-business">Business/Profession</div>
+                <div class="income-head-tab" onclick="switchIncomeHead('capital')" id="tab-capital">Capital Gains</div>
+                <div class="income-head-tab" onclick="switchIncomeHead('other')" id="tab-other">Other Sources</div>
             </div>
 
             <!-- HEAD 1: SALARY -->
             <div class="income-head-content active" id="head-salary">
                 <div class="head-of-income">
-                    <h3>💰 Income from Salary (Section 15-17)</h3>
+                    <h3>Income from Salary (Section 15-17)</h3>
                     <div class="grid-2">
                         <div class="form-group">
                             <label>Basic Salary (Annual)</label>
@@ -304,7 +296,7 @@
             <!-- HEAD 2: HOUSE PROPERTY -->
             <div class="income-head-content" id="head-house">
                 <div class="head-of-income">
-                    <h3>🏠 Income from House Property (Section 22-27)</h3>
+                    <h3>Income from House Property (Section 22-27)</h3>
                     <div id="houseProperties">
                         <div class="expense-category" id="property-1">
                             <h4>Property 1</h4>
@@ -350,7 +342,7 @@
             <!-- HEAD 3: BUSINESS/PROFESSION -->
             <div class="income-head-content" id="head-business">
                 <div class="head-of-income">
-                    <h3>💼 Profits & Gains from Business/Profession (Section 28-44)</h3>
+                    <h3>Profits & Gains from Business/Profession (Section 28-44)</h3>
 
                     <div class="form-group">
                         <label>Business Type</label>
@@ -365,8 +357,8 @@
 
                     <!-- Presumptive 44AD -->
                     <div id="section44AD" class="hidden expense-category">
-                        <h4>📊 Section 44AD - Presumptive Business Income</h4>
-                        <p class="label-hint" style="margin-bottom: 10px;">For businesses with turnover ≤ ₹3Cr (digital 95%) or ≤ ₹2Cr</p>
+                        <h4>Section 44AD - Presumptive Business Income</h4>
+                        <p class="label-hint" style="margin-bottom: 10px;">For businesses with turnover up to ₹3Cr (if digital receipts ≥95%) or ₹2Cr</p>
                         <div class="grid-2">
                             <div class="form-group">
                                 <label>Gross Turnover / Receipts</label>
@@ -379,14 +371,14 @@
                             </div>
                         </div>
                         <div class="success-box" id="calc44AD">
-                            Deemed Profit: ₹0 (Digital: ₹0 × 6% + Cash: ₹0 × 8%)
+                            Deemed Profit: ₹0 (Digital: ₹0 x 6% + Cash: ₹0 x 8%)
                         </div>
                     </div>
 
                     <!-- Presumptive 44ADA -->
                     <div id="section44ADA" class="hidden expense-category">
-                        <h4>⚖️ Section 44ADA - Presumptive Professional Income</h4>
-                        <p class="label-hint" style="margin-bottom: 10px;">For specified professionals with receipts ≤ ₹75L (digital) or ≤ ₹50L</p>
+                        <h4>Section 44ADA - Presumptive Professional Income</h4>
+                        <p class="label-hint" style="margin-bottom: 10px;">For specified professionals with receipts up to ₹75L (digital) or ₹50L</p>
                         <div class="form-group">
                             <label>Gross Professional Receipts</label>
                             <input type="number" id="receipts44ADA" placeholder="0" value="0" onchange="calculate44ADA()">
@@ -398,7 +390,7 @@
 
                     <!-- Presumptive 44AE -->
                     <div id="section44AE" class="hidden expense-category">
-                        <h4>🚛 Section 44AE - Goods Carriage</h4>
+                        <h4>Section 44AE - Goods Carriage</h4>
                         <div class="grid-2">
                             <div class="form-group">
                                 <label>Heavy Goods Vehicles (Count)</label>
@@ -419,7 +411,7 @@
                     <!-- Regular Business -->
                     <div id="sectionRegularBusiness" class="hidden">
                         <div class="expense-category">
-                            <h4>📒 Book Profit Computation</h4>
+                            <h4>Book Profit Computation</h4>
                             <div class="grid-2">
                                 <div class="form-group">
                                     <label>Gross Receipts / Turnover</label>
@@ -432,7 +424,6 @@
                             </div>
                         </div>
 
-                        <!-- Deductible Expenses with Weights -->
                         <div class="expense-category">
                             <h4><span class="category-icon">1</span> Expenses - 100% Deductible</h4>
                             <div class="grid-3">
@@ -467,7 +458,6 @@
                                 <div class="form-group">
                                     <label>Employer PF/ESI (Sec 36(1)(iv)) <span class="weight-badge">100%</span></label>
                                     <input type="number" id="expEmployerPF" placeholder="0" value="0">
-                                    <span class="label-limit">If paid before due date</span>
                                 </div>
                                 <div class="form-group">
                                     <label>Gratuity Fund (Sec 36(1)(v)) <span class="weight-badge">100%</span></label>
@@ -480,17 +470,15 @@
                             </div>
                         </div>
 
-                        <!-- Weighted Deductions -->
                         <div class="expense-category">
                             <h4><span class="category-icon">2</span> Weighted Deductions (As per IT Act)</h4>
                             <div class="info-box">
-                                💡 Certain expenses qualify for weighted deduction - you can claim more than 100% of actual expenditure.
+                                Certain expenses qualify for weighted deduction - you can claim more than 100% of actual expenditure.
                             </div>
                             <div class="grid-2">
                                 <div class="form-group">
                                     <label>Scientific Research - In-house (Sec 35(1)) <span class="weight-badge">100%</span></label>
                                     <input type="number" id="expResearchInhouse" placeholder="0" value="0">
-                                    <span class="label-limit">Revenue expenditure on scientific research</span>
                                 </div>
                                 <div class="form-group">
                                     <label>Scientific Research - Approved Institution (Sec 35(1)(ii)) <span class="weight-badge">100%</span></label>
@@ -499,28 +487,26 @@
                             </div>
                             <div class="grid-2">
                                 <div class="form-group">
-                                    <label>Capital Expenditure on Scientific Research (Sec 35(1)(iv)) <span class="weight-badge">100%</span></label>
+                                    <label>Capital Expenditure on Research (Sec 35(1)(iv)) <span class="weight-badge">100%</span></label>
                                     <input type="number" id="expResearchCapital" placeholder="0" value="0">
                                 </div>
                                 <div class="form-group">
                                     <label>Expenditure on Specified Business (Sec 35AD) <span class="weight-badge">100%</span></label>
                                     <input type="number" id="exp35AD" placeholder="0" value="0">
-                                    <span class="label-limit">Cold chain, warehousing, hospital, etc.</span>
                                 </div>
                             </div>
                             <div class="grid-2">
                                 <div class="form-group">
-                                    <label>Expenditure on Skill Development (Sec 35CCD) <span class="weight-badge">100%</span></label>
+                                    <label>Skill Development (Sec 35CCD) <span class="weight-badge">100%</span></label>
                                     <input type="number" id="expSkillDev" placeholder="0" value="0">
                                 </div>
                                 <div class="form-group">
-                                    <label>Agricultural Extension Project (Sec 35CCC) <span class="weight-badge">100%</span></label>
+                                    <label>Agricultural Extension (Sec 35CCC) <span class="weight-badge">100%</span></label>
                                     <input type="number" id="expAgriExtension" placeholder="0" value="0">
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Cost of Goods Sold -->
                         <div class="expense-category">
                             <h4><span class="category-icon">3</span> Cost of Goods Sold</h4>
                             <div class="grid-2">
@@ -545,7 +531,6 @@
                             </div>
                         </div>
 
-                        <!-- Depreciation Link -->
                         <div class="expense-category">
                             <h4><span class="category-icon">4</span> Depreciation (From Calculator Below)</h4>
                             <div class="success-box">
@@ -563,20 +548,24 @@
             <!-- HEAD 4: CAPITAL GAINS -->
             <div class="income-head-content" id="head-capital">
                 <div class="head-of-income">
-                    <h3>📈 Capital Gains (Section 45-55)</h3>
+                    <h3>Capital Gains (Section 45-55) - Budget 2024 Updated</h3>
+
+                    <div class="warning-box">
+                        <strong>Budget 2024 Changes (From 23 July 2024):</strong> STCG 111A: 20% | LTCG 112A: 12.5% (₹1.25L exemption) | Other LTCG: 12.5% without indexation
+                    </div>
 
                     <div class="expense-category">
                         <h4>Short Term Capital Gains (STCG)</h4>
                         <div class="grid-2">
                             <div class="form-group">
-                                <label>STCG on Equity (Sec 111A) <span class="label-hint">@15%</span></label>
+                                <label>STCG on Equity (Sec 111A) <span class="rate-badge">@20%</span></label>
                                 <input type="number" id="stcg111A" placeholder="0" value="0">
-                                <span class="label-limit">Listed shares with STT paid</span>
+                                <span class="label-limit">Listed shares/equity MF with STT paid (Holding &lt; 12 months)</span>
                             </div>
                             <div class="form-group">
-                                <label>Other STCG <span class="label-hint">@Normal Rates</span></label>
+                                <label>Other STCG <span class="label-hint">@Normal Slab Rates</span></label>
                                 <input type="number" id="stcgOther" placeholder="0" value="0">
-                                <span class="label-limit">Property, debt funds, unlisted shares</span>
+                                <span class="label-limit">Property (&lt;24m), Debt funds, Unlisted shares (&lt;24m)</span>
                             </div>
                         </div>
                     </div>
@@ -585,14 +574,14 @@
                         <h4>Long Term Capital Gains (LTCG)</h4>
                         <div class="grid-2">
                             <div class="form-group">
-                                <label>LTCG on Equity (Sec 112A) <span class="label-hint">@10% above ₹1L</span></label>
+                                <label>LTCG on Equity (Sec 112A) <span class="rate-badge">@12.5%</span></label>
                                 <input type="number" id="ltcg112A" placeholder="0" value="0">
-                                <span class="label-limit">Listed shares/equity MF with STT</span>
+                                <span class="label-limit">Listed shares/equity MF with STT (Holding ≥ 12 months) | Exemption: ₹1.25L</span>
                             </div>
                             <div class="form-group">
-                                <label>Other LTCG (Sec 112) <span class="label-hint">@20% with indexation</span></label>
+                                <label>Other LTCG (Sec 112) <span class="rate-badge">@12.5%</span></label>
                                 <input type="number" id="ltcgOther" placeholder="0" value="0">
-                                <span class="label-limit">Property, gold, debt funds</span>
+                                <span class="label-limit">Property, Gold, Unlisted shares (Holding ≥ 24 months) | No indexation</span>
                             </div>
                         </div>
                     </div>
@@ -615,7 +604,7 @@
                     </div>
 
                     <div class="success-box" id="capitalCalculation">
-                        <strong>Capital Gains:</strong> STCG (111A): ₹0 | Other STCG: ₹0 | LTCG (112A): ₹0 | Other LTCG: ₹0
+                        <strong>Capital Gains:</strong> STCG (111A): ₹0 @20% | Other STCG: ₹0 | LTCG (112A): ₹0 @12.5% | Other LTCG: ₹0 @12.5%
                     </div>
                 </div>
             </div>
@@ -623,7 +612,7 @@
             <!-- HEAD 5: OTHER SOURCES -->
             <div class="income-head-content" id="head-other">
                 <div class="head-of-income">
-                    <h3>📋 Income from Other Sources (Section 56-59)</h3>
+                    <h3>Income from Other Sources (Section 56-59)</h3>
 
                     <div class="expense-category">
                         <h4>Interest Income</h4>
@@ -675,7 +664,7 @@
                         </div>
                         <div class="grid-2">
                             <div class="form-group">
-                                <label>Lottery / Gambling Winnings (Sec 115BB) <span class="label-hint">@30%</span></label>
+                                <label>Lottery / Gambling Winnings (Sec 115BB) <span class="rate-badge">@30%</span></label>
                                 <input type="number" id="lottery" placeholder="0" value="0">
                             </div>
                             <div class="form-group">
@@ -692,14 +681,140 @@
             </div>
         </div>
 
+        <!-- LTCG INDEXATION CALCULATOR -->
+        <div class="card">
+            <h2 class="card-title collapsible" onclick="toggleSection('indexationCalc')">
+                LTCG Indexation Comparison Tool (For Property Purchased Before 23 July 2024)
+            </h2>
+            <div id="indexationCalc" class="section-content">
+                <div class="info-box">
+                    <strong>Special Rule:</strong> For land/building purchased BEFORE 23 July 2024, you can choose between:<br>
+                    Option 1: 12.5% tax WITHOUT indexation | Option 2: 20% tax WITH indexation<br>
+                    This tool helps you calculate which option saves more tax.
+                </div>
+
+                <div class="expense-category">
+                    <h4>Property / Asset Details</h4>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Purchase Financial Year</label>
+                            <select id="indexPurchaseYear">
+                                <option value="2001-02">2001-02 (CII: 100)</option>
+                                <option value="2002-03">2002-03 (CII: 105)</option>
+                                <option value="2003-04">2003-04 (CII: 109)</option>
+                                <option value="2004-05">2004-05 (CII: 113)</option>
+                                <option value="2005-06">2005-06 (CII: 117)</option>
+                                <option value="2006-07">2006-07 (CII: 122)</option>
+                                <option value="2007-08">2007-08 (CII: 129)</option>
+                                <option value="2008-09">2008-09 (CII: 137)</option>
+                                <option value="2009-10">2009-10 (CII: 148)</option>
+                                <option value="2010-11">2010-11 (CII: 167)</option>
+                                <option value="2011-12">2011-12 (CII: 184)</option>
+                                <option value="2012-13">2012-13 (CII: 200)</option>
+                                <option value="2013-14">2013-14 (CII: 220)</option>
+                                <option value="2014-15">2014-15 (CII: 240)</option>
+                                <option value="2015-16" selected>2015-16 (CII: 254)</option>
+                                <option value="2016-17">2016-17 (CII: 264)</option>
+                                <option value="2017-18">2017-18 (CII: 272)</option>
+                                <option value="2018-19">2018-19 (CII: 280)</option>
+                                <option value="2019-20">2019-20 (CII: 289)</option>
+                                <option value="2020-21">2020-21 (CII: 301)</option>
+                                <option value="2021-22">2021-22 (CII: 317)</option>
+                                <option value="2022-23">2022-23 (CII: 331)</option>
+                                <option value="2023-24">2023-24 (CII: 348)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Sale Financial Year</label>
+                            <select id="indexSaleYear">
+                                <option value="2024-25" selected>2024-25 (CII: 363)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Purchase Cost (₹)</label>
+                            <input type="number" id="indexPurchaseCost" placeholder="5000000" value="5000000">
+                        </div>
+                        <div class="form-group">
+                            <label>Sale Value (₹)</label>
+                            <input type="number" id="indexSaleValue" placeholder="10000000" value="10000000">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Improvement Cost (if any)</label>
+                        <input type="number" id="indexImprovementCost" placeholder="0" value="0">
+                    </div>
+                    <button class="btn btn-warning" onclick="calculateIndexation()">Calculate & Compare</button>
+                </div>
+
+                <div class="indexation-result hidden" id="indexationResult">
+                    <h4 style="margin-bottom: 15px; color: #1a1a2e;">Indexation Comparison Result</h4>
+
+                    <div class="grid-2" style="margin-bottom: 15px;">
+                        <div>
+                            <strong>CII of Purchase Year:</strong> <span id="ciiPurchase">254</span><br>
+                            <strong>CII of Sale Year:</strong> <span id="ciiSale">363</span>
+                        </div>
+                        <div>
+                            <strong>Indexed Cost:</strong> <span id="indexedCost">₹0</span><br>
+                            <strong>Indexation Benefit:</strong> <span id="indexationBenefit">₹0</span>
+                        </div>
+                    </div>
+
+                    <div class="indexation-comparison">
+                        <div class="indexation-option" id="option1">
+                            <h5>Option 1: Without Indexation</h5>
+                            <div>LTCG: <span id="ltcgWithoutIndex">₹0</span></div>
+                            <div class="tax-value" id="taxWithoutIndex">₹0</div>
+                            <div>Tax @ 12.5%</div>
+                        </div>
+                        <div class="indexation-option" id="option2">
+                            <h5>Option 2: With Indexation</h5>
+                            <div>LTCG: <span id="ltcgWithIndex">₹0</span></div>
+                            <div class="tax-value" id="taxWithIndex">₹0</div>
+                            <div>Tax @ 20%</div>
+                        </div>
+                    </div>
+
+                    <div class="success-box" id="indexationRecommendation" style="margin-top: 15px; text-align: center;">
+                        <strong>Recommendation:</strong> <span id="recommendedOption">-</span><br>
+                        <span id="taxSavingsAmount">You save: ₹0</span>
+                    </div>
+                </div>
+
+                <!-- CII Reference Table -->
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-small btn-secondary" onclick="toggleCIITable()">View Full CII Table</button>
+                    <div id="ciiTable" class="hidden" style="margin-top: 15px;">
+                        <table class="slabs-table">
+                            <thead>
+                                <tr><th>FY</th><th>CII</th><th>FY</th><th>CII</th><th>FY</th><th>CII</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>2001-02</td><td>100</td><td>2009-10</td><td>148</td><td>2017-18</td><td>272</td></tr>
+                                <tr><td>2002-03</td><td>105</td><td>2010-11</td><td>167</td><td>2018-19</td><td>280</td></tr>
+                                <tr><td>2003-04</td><td>109</td><td>2011-12</td><td>184</td><td>2019-20</td><td>289</td></tr>
+                                <tr><td>2004-05</td><td>113</td><td>2012-13</td><td>200</td><td>2020-21</td><td>301</td></tr>
+                                <tr><td>2005-06</td><td>117</td><td>2013-14</td><td>220</td><td>2021-22</td><td>317</td></tr>
+                                <tr><td>2006-07</td><td>122</td><td>2014-15</td><td>240</td><td>2022-23</td><td>331</td></tr>
+                                <tr><td>2007-08</td><td>129</td><td>2015-16</td><td>254</td><td>2023-24</td><td>348</td></tr>
+                                <tr><td>2008-09</td><td>137</td><td>2016-17</td><td>264</td><td>2024-25</td><td>363</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- DEPRECIATION CALCULATOR -->
         <div class="card">
-            <h2 class="card-title collapsible active" onclick="toggleSection('depCalcSection')">
-                🧮 Depreciation Calculator (Section 32)
+            <h2 class="card-title collapsible" onclick="toggleSection('depCalcSection')">
+                Depreciation Calculator (Section 32)
             </h2>
-            <div id="depCalcSection" class="section-content show">
+            <div id="depCalcSection" class="section-content">
                 <div class="info-box">
-                    💡 Add your assets to automatically calculate depreciation using WDV method. Depreciation is allowed under both Old & New tax regimes for business income.
+                    Add your assets to automatically calculate depreciation using WDV method. Depreciation is allowed under both Old & New tax regimes for business income.
                 </div>
 
                 <div class="expense-category">
@@ -763,7 +878,7 @@
                 </div>
 
                 <div class="dep-summary">
-                    <h4 style="margin-bottom: 10px;">📊 Depreciation Summary for FY 2024-25</h4>
+                    <h4 style="margin-bottom: 10px;">Depreciation Summary for FY 2024-25</h4>
                     <div class="dep-summary-item">
                         <span>Opening WDV (All Blocks)</span>
                         <span id="totalOpeningWDV">₹0</span>
@@ -790,7 +905,6 @@
                     </div>
                 </div>
 
-                <!-- Depreciation Rates Reference -->
                 <div style="margin-top: 20px;">
                     <button class="btn btn-small btn-secondary" onclick="toggleDepRates()">View Depreciation Rates</button>
                     <div id="depRatesTable" class="hidden" style="margin-top: 15px;">
@@ -804,11 +918,9 @@
                                 <tr><td>II</td><td>Furniture & Fittings</td><td>10%</td><td>All furniture</td></tr>
                                 <tr><td>III</td><td>Plant & Machinery (General)</td><td>15%</td><td>Most equipment</td></tr>
                                 <tr><td>III</td><td>Motor Vehicles</td><td>15%</td><td>Cars, bikes</td></tr>
-                                <tr><td>III</td><td>Ships, Vessels</td><td>20%</td><td>-</td></tr>
                                 <tr><td>IV</td><td>Commercial Vehicles</td><td>30%</td><td>Buses, lorries for hire</td></tr>
                                 <tr><td>V</td><td>Computers & Software</td><td>40%</td><td>High depreciation</td></tr>
-                                <tr><td>VI</td><td>Intangible Assets</td><td>25%</td><td>Patents, copyrights, trademarks</td></tr>
-                                <tr><td>-</td><td>Energy Saving Devices</td><td>40%</td><td>Solar, windmills</td></tr>
+                                <tr><td>VI</td><td>Intangible Assets</td><td>25%</td><td>Patents, copyrights</td></tr>
                             </tbody>
                         </table>
                         <div class="warning-box" style="margin-top: 10px;">
@@ -820,17 +932,16 @@
             </div>
         </div>
 
-        <!-- Continue in Part 2... Chapter VI-A Deductions -->
+        <!-- Chapter VI-A Deductions -->
         <div class="card">
             <h2 class="card-title collapsible" onclick="toggleSection('chapterVIA')">
-                📋 Chapter VI-A Deductions
+                Chapter VI-A Deductions
             </h2>
             <div id="chapterVIA" class="section-content">
                 <div class="info-box">
-                    💡 <strong>New Regime:</strong> Only Sec 80CCD(2) allowed. <strong>Old Regime:</strong> All deductions available.
+                    <strong>New Regime:</strong> Only Sec 80CCD(2) allowed. <strong>Old Regime:</strong> All deductions available.
                 </div>
 
-                <!-- 80C -->
                 <div class="expense-category">
                     <h4>Section 80C/80CCC/80CCD(1) <span class="regime-badge badge-old">Old Regime</span></h4>
                     <p class="label-hint" style="margin-bottom:10px;">Combined Limit: ₹1,50,000</p>
@@ -864,7 +975,6 @@
                     </div>
                 </div>
 
-                <!-- 80CCD -->
                 <div class="expense-category">
                     <h4>Section 80CCD - NPS</h4>
                     <div class="grid-2">
@@ -881,7 +991,6 @@
                     </div>
                 </div>
 
-                <!-- 80D -->
                 <div class="expense-category">
                     <h4>Section 80D - Health Insurance <span class="regime-badge badge-old">Old Regime</span></h4>
                     <div class="grid-3">
@@ -903,7 +1012,6 @@
                     </div>
                 </div>
 
-                <!-- Other Deductions -->
                 <div class="expense-category">
                     <h4>Other Deductions <span class="regime-badge badge-old">Old Regime</span></h4>
                     <div class="grid-2">
@@ -935,14 +1043,13 @@
         </div>
 
         <!-- CALCULATE BUTTON -->
-        <button class="btn btn-full" onclick="calculateTax()">🧮 Calculate & Compare Tax</button>
+        <button class="btn btn-full" onclick="calculateTax()">Calculate & Compare Tax</button>
 
         <!-- RESULTS -->
         <div class="results" id="results">
             <div class="card">
-                <h2 class="card-title">📊 Tax Computation Results</h2>
+                <h2 class="card-title">Tax Computation Results</h2>
 
-                <!-- Income Summary -->
                 <div class="expense-category" style="margin-bottom: 20px;">
                     <h4>Gross Total Income (All Heads)</h4>
                     <table class="slabs-table" id="incomeSummaryTable">
@@ -977,9 +1084,46 @@
                 </div>
             </div>
 
+            <!-- Surcharge Reference -->
+            <div class="card">
+                <h2 class="card-title collapsible" onclick="toggleSection('surchargeRef')">
+                    Surcharge Rates Reference
+                </h2>
+                <div id="surchargeRef" class="section-content">
+                    <div class="grid-2">
+                        <div>
+                            <h4 style="margin-bottom: 10px;">Old Tax Regime</h4>
+                            <table class="slabs-table">
+                                <tr><th>Income Range</th><th>Surcharge</th></tr>
+                                <tr><td>Up to ₹50L</td><td>0%</td></tr>
+                                <tr><td>₹50L - ₹1Cr</td><td>10%</td></tr>
+                                <tr><td>₹1Cr - ₹2Cr</td><td>15%</td></tr>
+                                <tr><td>₹2Cr - ₹5Cr</td><td>25%</td></tr>
+                                <tr><td>Above ₹5Cr</td><td>37%</td></tr>
+                            </table>
+                        </div>
+                        <div>
+                            <h4 style="margin-bottom: 10px;">New Tax Regime</h4>
+                            <table class="slabs-table">
+                                <tr><th>Income Range</th><th>Surcharge</th></tr>
+                                <tr><td>Up to ₹50L</td><td>0%</td></tr>
+                                <tr><td>₹50L - ₹1Cr</td><td>10%</td></tr>
+                                <tr><td>₹1Cr - ₹2Cr</td><td>15%</td></tr>
+                                <tr><td>Above ₹2Cr</td><td>25% (Capped)</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="info-box" style="margin-top: 15px;">
+                        <strong>Capital Gains Surcharge:</strong> Maximum 15% surcharge on STCG 111A, LTCG 112, 112A<br>
+                        <strong>Health & Education Cess:</strong> 4% on (Tax + Surcharge)
+                    </div>
+                </div>
+            </div>
+
             <div class="disclaimer">
-                <strong>Disclaimer:</strong> This calculator provides estimates based on Income Tax Act FY 2024-25.
+                <strong>Disclaimer:</strong> This calculator provides estimates based on Income Tax Act FY 2024-25 (Budget 2024 updated).
                 Consult a qualified CA for accurate filing. Special rates apply for Capital Gains and Lottery income.
+                Marginal relief may apply at surcharge thresholds.
             </div>
         </div>
     </div>
@@ -990,6 +1134,16 @@
         let currentIncomeHead = 'salary';
         let assets = [];
         let propertyCount = 1;
+
+        // Cost Inflation Index Table
+        const ciiTable = {
+            '2001-02': 100, '2002-03': 105, '2003-04': 109, '2004-05': 113,
+            '2005-06': 117, '2006-07': 122, '2007-08': 129, '2008-09': 137,
+            '2009-10': 148, '2010-11': 167, '2011-12': 184, '2012-13': 200,
+            '2013-14': 220, '2014-15': 240, '2015-16': 254, '2016-17': 264,
+            '2017-18': 272, '2018-19': 280, '2019-20': 289, '2020-21': 301,
+            '2021-22': 317, '2022-23': 331, '2023-24': 348, '2024-25': 363
+        };
 
         const depRates = {
             'building5': { name: 'Building (Residential)', rate: 0.05 },
@@ -1024,13 +1178,16 @@
             document.getElementById('depRatesTable').classList.toggle('hidden');
         }
 
+        function toggleCIITable() {
+            document.getElementById('ciiTable').classList.toggle('hidden');
+        }
+
         // Assessee Type Switch
         function switchAssesseeType(type) {
             currentAssesseeType = type;
             document.querySelectorAll('.tab-container .tab-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
 
-            // Show/hide age group based on assessee type
             const ageGroup = document.getElementById('ageGroup').parentElement;
             if (type === 'individual') {
                 ageGroup.classList.remove('hidden');
@@ -1061,7 +1218,6 @@
             const bonus = getVal('salaryBonus');
             const perks = getVal('perquisites');
 
-            // HRA Exemption Calculation
             const basicPlusDa = basic + da;
             const cityPercent = cityType === 'metro' ? 0.50 : 0.40;
             const hraExempt1 = hraReceived;
@@ -1096,15 +1252,13 @@
                 let gav = 0, nav = 0, stdDed = 0, intDed = 0, income = 0;
 
                 if (type === 'selfoccupied') {
-                    // Self-occupied: GAV = 0, Interest max 2L
                     intDed = Math.min(interest, 200000);
                     income = -intDed;
                 } else {
-                    // Let out / Deemed let out
                     gav = rent;
                     nav = gav - municipal;
                     stdDed = nav * 0.30;
-                    intDed = interest; // No limit for let out
+                    intDed = interest;
                     income = nav - stdDed - intDed;
                 }
 
@@ -1186,7 +1340,7 @@
             const digital = getVal('digital44AD');
             const cash = turnover - digital;
             const profit = (digital * 0.06) + (cash * 0.08);
-            document.getElementById('calc44AD').innerHTML = `Deemed Profit: ${formatCurrency(profit)} (Digital: ${formatCurrency(digital)} × 6% + Cash: ${formatCurrency(cash)} × 8%)`;
+            document.getElementById('calc44AD').innerHTML = `Deemed Profit: ${formatCurrency(profit)} (Digital: ${formatCurrency(digital)} x 6% + Cash: ${formatCurrency(cash)} x 8%)`;
             return profit;
         }
 
@@ -1201,8 +1355,61 @@
             const heavy = getVal('heavyVehicles');
             const other = getVal('otherVehicles');
             const profit = (heavy * 7500 * 12) + (other * 7500 * 12);
-            document.getElementById('calc44AE').innerHTML = `Deemed Profit: ${formatCurrency(profit)} (${heavy + other} vehicles × ₹7,500 × 12 months)`;
+            document.getElementById('calc44AE').innerHTML = `Deemed Profit: ${formatCurrency(profit)} (${heavy + other} vehicles x ₹7,500 x 12 months)`;
             return profit;
+        }
+
+        // LTCG INDEXATION CALCULATOR
+        function calculateIndexation() {
+            const purchaseYear = document.getElementById('indexPurchaseYear').value;
+            const saleYear = document.getElementById('indexSaleYear').value;
+            const purchaseCost = getVal('indexPurchaseCost');
+            const saleValue = getVal('indexSaleValue');
+            const improvementCost = getVal('indexImprovementCost');
+
+            const ciiPurchase = ciiTable[purchaseYear];
+            const ciiSale = ciiTable[saleYear];
+
+            // Indexed Cost Calculation
+            const indexedCost = (purchaseCost * ciiSale / ciiPurchase) + improvementCost;
+            const indexationBenefit = indexedCost - purchaseCost - improvementCost;
+
+            // LTCG Calculations
+            const ltcgWithoutIndex = saleValue - purchaseCost - improvementCost;
+            const ltcgWithIndex = saleValue - indexedCost;
+
+            // Tax Calculations
+            const taxWithoutIndex = Math.max(0, ltcgWithoutIndex) * 0.125; // 12.5%
+            const taxWithIndex = Math.max(0, ltcgWithIndex) * 0.20; // 20%
+
+            // Display results
+            document.getElementById('indexationResult').classList.remove('hidden');
+            document.getElementById('ciiPurchase').textContent = ciiPurchase;
+            document.getElementById('ciiSale').textContent = ciiSale;
+            document.getElementById('indexedCost').textContent = formatCurrency(indexedCost);
+            document.getElementById('indexationBenefit').textContent = formatCurrency(indexationBenefit);
+
+            document.getElementById('ltcgWithoutIndex').textContent = formatCurrency(ltcgWithoutIndex);
+            document.getElementById('taxWithoutIndex').textContent = formatCurrency(taxWithoutIndex);
+            document.getElementById('ltcgWithIndex').textContent = formatCurrency(ltcgWithIndex);
+            document.getElementById('taxWithIndex').textContent = formatCurrency(taxWithIndex);
+
+            // Recommendation
+            const option1 = document.getElementById('option1');
+            const option2 = document.getElementById('option2');
+            option1.classList.remove('better');
+            option2.classList.remove('better');
+
+            const taxSavings = Math.abs(taxWithoutIndex - taxWithIndex);
+
+            if (taxWithoutIndex <= taxWithIndex) {
+                option1.classList.add('better');
+                document.getElementById('recommendedOption').textContent = 'Option 1: 12.5% WITHOUT Indexation';
+            } else {
+                option2.classList.add('better');
+                document.getElementById('recommendedOption').textContent = 'Option 2: 20% WITH Indexation';
+            }
+            document.getElementById('taxSavingsAmount').textContent = `You save: ${formatCurrency(taxSavings)}`;
         }
 
         // DEPRECIATION CALCULATOR
@@ -1220,25 +1427,20 @@
             const purchaseDate = new Date(dateStr);
             const fyStart = new Date('2024-04-01');
             const fyEnd = new Date('2025-03-31');
-            const halfYearDate = new Date('2024-10-03'); // 180 days from April 1
+            const halfYearDate = new Date('2024-10-03');
 
-            // Calculate depreciation
             let openingWDV = 0;
             let currentYearAddition = 0;
             let depRate = depRates[block].rate;
             let depreciation = 0;
 
             if (purchaseDate < fyStart) {
-                // Asset purchased before this FY - calculate accumulated dep
                 const yearsSincePurchase = Math.floor((fyStart - purchaseDate) / (365.25 * 24 * 60 * 60 * 1000));
                 openingWDV = cost * Math.pow(1 - depRate, yearsSincePurchase);
                 depreciation = openingWDV * depRate;
             } else if (purchaseDate >= fyStart && purchaseDate <= fyEnd) {
-                // Asset purchased in current FY
                 currentYearAddition = cost;
                 openingWDV = 0;
-
-                // Half year rule
                 if (purchaseDate > halfYearDate) {
                     depreciation = cost * depRate * 0.5;
                 } else {
@@ -1266,7 +1468,6 @@
             renderAssetTable();
             updateDepreciationSummary();
 
-            // Clear inputs
             document.getElementById('newAssetName').value = '';
             document.getElementById('newAssetCost').value = '';
         }
@@ -1294,7 +1495,7 @@
                     <td>${formatCurrency(a.openingWDV)}</td>
                     <td>${formatCurrency(a.depreciation)}</td>
                     <td>${formatCurrency(a.closingWDV)}</td>
-                    <td><button class="btn btn-small btn-danger" onclick="removeAsset(${a.id})">×</button></td>
+                    <td><button class="btn btn-small btn-danger" onclick="removeAsset(${a.id})">x</button></td>
                 </tr>
             `).join('');
         }
@@ -1314,6 +1515,54 @@
             document.getElementById('totalDepFromCalc').textContent = formatCurrency(totalDep);
         }
 
+        // SURCHARGE CALCULATION
+        function calculateSurcharge(tax, taxableIncome, isNewRegime, isCapitalGains = false) {
+            // Capital gains surcharge capped at 15%
+            if (isCapitalGains) {
+                if (taxableIncome > 10000000) return tax * 0.15;
+                else if (taxableIncome > 5000000) return tax * 0.10;
+                return 0;
+            }
+
+            if (isNewRegime) {
+                // New regime - capped at 25%
+                if (taxableIncome > 20000000) return tax * 0.25;
+                else if (taxableIncome > 10000000) return tax * 0.15;
+                else if (taxableIncome > 5000000) return tax * 0.10;
+            } else {
+                // Old regime
+                if (taxableIncome > 50000000) return tax * 0.37;
+                else if (taxableIncome > 20000000) return tax * 0.25;
+                else if (taxableIncome > 10000000) return tax * 0.15;
+                else if (taxableIncome > 5000000) return tax * 0.10;
+            }
+            return 0;
+        }
+
+        // MARGINAL RELIEF CALCULATION
+        function calculateMarginalRelief(tax, surcharge, taxableIncome, isNewRegime, ageGroup) {
+            const thresholds = [5000000, 10000000, 20000000, 50000000];
+
+            for (const threshold of thresholds) {
+                if (taxableIncome > threshold && taxableIncome <= threshold * 1.2) {
+                    const taxAtThreshold = isNewRegime
+                        ? calculateNewRegimeTax(threshold)
+                        : calculateOldRegimeTax(threshold, ageGroup);
+                    const surchargeAtThreshold = calculateSurcharge(taxAtThreshold, threshold, isNewRegime);
+                    const totalAtThreshold = taxAtThreshold + surchargeAtThreshold;
+
+                    const excessIncome = taxableIncome - threshold;
+                    const maxTax = totalAtThreshold + excessIncome;
+                    const actualTax = tax + surcharge;
+
+                    if (actualTax > maxTax) {
+                        return actualTax - maxTax;
+                    }
+                }
+            }
+            return 0;
+        }
+
         // TAX CALCULATION
         function calculateNewRegimeTax(income) {
             let tax = 0;
@@ -1324,7 +1573,6 @@
             else if (income <= 1500000) tax = 80000 + (income - 1200000) * 0.20;
             else tax = 140000 + (income - 1500000) * 0.30;
 
-            // Rebate u/s 87A
             if (income <= 700000) tax = 0;
             return tax;
         }
@@ -1340,7 +1588,6 @@
             else if (income <= 1000000) tax = (500000 - exemption) * 0.05 + (income - 500000) * 0.20;
             else tax = (500000 - exemption) * 0.05 + 500000 * 0.20 + (income - 1000000) * 0.30;
 
-            // Rebate
             if (income <= 500000) tax = Math.max(0, tax - 12500);
             return tax;
         }
@@ -1373,16 +1620,16 @@
             }
             document.getElementById('businessCalculation').innerHTML = `<strong>Business/Profession Income:</strong> ${formatCurrency(businessIncome)}`;
 
-            // 4. Capital Gains
+            // 4. Capital Gains - BUDGET 2024 UPDATED RATES
             const stcg111A = getVal('stcg111A');
             const stcgOther = getVal('stcgOther');
-            const ltcg112A = Math.max(0, getVal('ltcg112A') - 100000); // 1L exemption
+            const ltcg112A = Math.max(0, getVal('ltcg112A') - 125000); // ₹1.25L exemption (updated)
             const ltcgOther = getVal('ltcgOther');
-            const capitalNormal = stcgOther; // Taxed at normal rates
+            const capitalNormal = stcgOther;
             document.getElementById('capitalCalculation').innerHTML = `
-                <strong>Capital Gains:</strong> STCG (111A): ${formatCurrency(stcg111A)} @15% |
-                Other STCG: ${formatCurrency(stcgOther)} | LTCG (112A): ${formatCurrency(ltcg112A)} @10% |
-                Other LTCG: ${formatCurrency(ltcgOther)} @20%
+                <strong>Capital Gains:</strong> STCG (111A): ${formatCurrency(stcg111A)} @20% |
+                Other STCG: ${formatCurrency(stcgOther)} | LTCG (112A): ${formatCurrency(ltcg112A)} @12.5% |
+                Other LTCG: ${formatCurrency(ltcgOther)} @12.5%
             `;
 
             // 5. Other Sources
@@ -1391,7 +1638,7 @@
             const lottery = getVal('lottery');
             document.getElementById('otherCalculation').innerHTML = `<strong>Other Sources Income:</strong> ${formatCurrency(otherIncome + lottery)}`;
 
-            // Gross Total Income (excluding special rate items)
+            // Gross Total Income
             const gti = salaryIncome + Math.max(-200000, houseIncome) + businessIncome + capitalNormal + otherIncome;
 
             // Update summary table
@@ -1417,7 +1664,7 @@
             const ded80DD = getVal('ded80DD');
 
             const totalDedOld = ded80C + ded80CCD1B + ded80CCD2 + ded80D + ded80E + ded80G + ded80TTA + ded80DD;
-            const totalDedNew = ded80CCD2; // Only employer NPS
+            const totalDedNew = ded80CCD2;
 
             // Taxable Income
             const taxableNew = Math.max(0, gti - stdDeductionNew - totalDedNew);
@@ -1427,23 +1674,35 @@
             let newTax = calculateNewRegimeTax(taxableNew);
             let oldTax = calculateOldRegimeTax(taxableOld, ageGroup);
 
-            // Add Special Rate Taxes
-            const stcg111ATax = stcg111A * 0.15;
-            const ltcg112ATax = ltcg112A * 0.10;
-            const ltcgOtherTax = ltcgOther * 0.20;
+            // BUDGET 2024 UPDATED CAPITAL GAINS RATES
+            const stcg111ATax = stcg111A * 0.20;       // 20% (updated from 15%)
+            const ltcg112ATax = ltcg112A * 0.125;     // 12.5% (updated from 10%)
+            const ltcgOtherTax = ltcgOther * 0.125;   // 12.5% (updated from 20%)
             const lotteryTax = lottery * 0.30;
 
-            newTax += stcg111ATax + ltcg112ATax + ltcgOtherTax + lotteryTax;
-            oldTax += stcg111ATax + ltcg112ATax + ltcgOtherTax + lotteryTax;
+            // Surcharge on Normal Income
+            const newSurchargeNormal = calculateSurcharge(newTax, taxableNew, true, false);
+            const oldSurchargeNormal = calculateSurcharge(oldTax, taxableOld, false, false);
 
-            // Surcharge & Cess
-            const newSurcharge = taxableNew > 5000000 ? newTax * 0.10 : 0;
-            const oldSurcharge = taxableOld > 5000000 ? oldTax * 0.10 : 0;
-            const newCess = (newTax + newSurcharge) * 0.04;
-            const oldCess = (oldTax + oldSurcharge) * 0.04;
+            // Surcharge on Capital Gains (capped at 15%)
+            const totalCapitalGainsTax = stcg111ATax + ltcg112ATax + ltcgOtherTax;
+            const totalCapitalGainsIncome = stcg111A + ltcg112A + ltcgOther;
+            const cgSurcharge = calculateSurcharge(totalCapitalGainsTax, totalCapitalGainsIncome + taxableNew, true, true);
 
-            const totalNewTax = newTax + newSurcharge + newCess;
-            const totalOldTax = oldTax + oldSurcharge + oldCess;
+            // Marginal Relief
+            const newMarginalRelief = calculateMarginalRelief(newTax, newSurchargeNormal, taxableNew, true, ageGroup);
+            const oldMarginalRelief = calculateMarginalRelief(oldTax, oldSurchargeNormal, taxableOld, false, ageGroup);
+
+            // Total Tax before Cess
+            const newTaxBeforeCess = newTax + stcg111ATax + ltcg112ATax + ltcgOtherTax + lotteryTax + newSurchargeNormal + cgSurcharge - newMarginalRelief;
+            const oldTaxBeforeCess = oldTax + stcg111ATax + ltcg112ATax + ltcgOtherTax + lotteryTax + oldSurchargeNormal + cgSurcharge - oldMarginalRelief;
+
+            // Health & Education Cess (4%)
+            const newCess = newTaxBeforeCess * 0.04;
+            const oldCess = oldTaxBeforeCess * 0.04;
+
+            const totalNewTax = newTaxBeforeCess + newCess;
+            const totalOldTax = oldTaxBeforeCess + oldCess;
 
             // Display Results
             document.getElementById('results').classList.add('show');
@@ -1454,11 +1713,13 @@
                 <div class="breakdown-item"><span>Std Deduction</span><span>-${formatCurrency(stdDeductionNew)}</span></div>
                 <div class="breakdown-item"><span>80CCD(2)</span><span>-${formatCurrency(ded80CCD2)}</span></div>
                 <div class="breakdown-item"><span>Taxable Income</span><span>${formatCurrency(taxableNew)}</span></div>
-                <div class="breakdown-item"><span>Tax on Normal</span><span>${formatCurrency(newTax - stcg111ATax - ltcg112ATax - ltcgOtherTax - lotteryTax)}</span></div>
-                <div class="breakdown-item"><span>Tax on STCG 111A</span><span>${formatCurrency(stcg111ATax)}</span></div>
-                <div class="breakdown-item"><span>Tax on LTCG</span><span>${formatCurrency(ltcg112ATax + ltcgOtherTax)}</span></div>
+                <div class="breakdown-item"><span>Tax on Slab</span><span>${formatCurrency(newTax)}</span></div>
+                <div class="breakdown-item"><span>STCG 111A @20%</span><span>${formatCurrency(stcg111ATax)}</span></div>
+                <div class="breakdown-item"><span>LTCG @12.5%</span><span>${formatCurrency(ltcg112ATax + ltcgOtherTax)}</span></div>
+                <div class="breakdown-item"><span>Surcharge</span><span>${formatCurrency(newSurchargeNormal + cgSurcharge)}</span></div>
+                ${newMarginalRelief > 0 ? `<div class="breakdown-item"><span>Marginal Relief</span><span>-${formatCurrency(newMarginalRelief)}</span></div>` : ''}
                 <div class="breakdown-item"><span>Cess (4%)</span><span>${formatCurrency(newCess)}</span></div>
-                <div class="breakdown-item" style="font-weight:600;border-top:1px solid #999;padding-top:8px;"><span>Effective Rate</span><span>${((totalNewTax / gti) * 100).toFixed(2)}%</span></div>
+                <div class="breakdown-item" style="font-weight:600;border-top:1px solid #999;padding-top:8px;"><span>Effective Rate</span><span>${gti > 0 ? ((totalNewTax / gti) * 100).toFixed(2) : 0}%</span></div>
             `;
 
             document.getElementById('oldTaxAmount').textContent = formatCurrency(totalOldTax);
@@ -1467,11 +1728,13 @@
                 <div class="breakdown-item"><span>Std Deduction</span><span>-${formatCurrency(stdDeductionOld)}</span></div>
                 <div class="breakdown-item"><span>Chapter VI-A</span><span>-${formatCurrency(totalDedOld)}</span></div>
                 <div class="breakdown-item"><span>Taxable Income</span><span>${formatCurrency(taxableOld)}</span></div>
-                <div class="breakdown-item"><span>Tax on Normal</span><span>${formatCurrency(oldTax - stcg111ATax - ltcg112ATax - ltcgOtherTax - lotteryTax)}</span></div>
-                <div class="breakdown-item"><span>Tax on STCG 111A</span><span>${formatCurrency(stcg111ATax)}</span></div>
-                <div class="breakdown-item"><span>Tax on LTCG</span><span>${formatCurrency(ltcg112ATax + ltcgOtherTax)}</span></div>
+                <div class="breakdown-item"><span>Tax on Slab</span><span>${formatCurrency(oldTax)}</span></div>
+                <div class="breakdown-item"><span>STCG 111A @20%</span><span>${formatCurrency(stcg111ATax)}</span></div>
+                <div class="breakdown-item"><span>LTCG @12.5%</span><span>${formatCurrency(ltcg112ATax + ltcgOtherTax)}</span></div>
+                <div class="breakdown-item"><span>Surcharge</span><span>${formatCurrency(oldSurchargeNormal + cgSurcharge)}</span></div>
+                ${oldMarginalRelief > 0 ? `<div class="breakdown-item"><span>Marginal Relief</span><span>-${formatCurrency(oldMarginalRelief)}</span></div>` : ''}
                 <div class="breakdown-item"><span>Cess (4%)</span><span>${formatCurrency(oldCess)}</span></div>
-                <div class="breakdown-item" style="font-weight:600;border-top:1px solid #999;padding-top:8px;"><span>Effective Rate</span><span>${((totalOldTax / gti) * 100).toFixed(2)}%</span></div>
+                <div class="breakdown-item" style="font-weight:600;border-top:1px solid #999;padding-top:8px;"><span>Effective Rate</span><span>${gti > 0 ? ((totalOldTax / gti) * 100).toFixed(2) : 0}%</span></div>
             `;
 
             // Recommendation
