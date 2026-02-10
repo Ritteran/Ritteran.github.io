@@ -696,6 +696,53 @@
         .expense-category.tier-4 { border-left-color: var(--tier-4); }
         .expense-category.tier-5 { border-left-color: var(--tier-5); }
 
+        .expense-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: var(--space-2);
+            margin-bottom: var(--space-2);
+        }
+
+        .expense-desc {
+            font-size: var(--font-size-xs);
+            color: var(--color-neutral-500);
+            margin-bottom: var(--space-4);
+        }
+
+        .deduction-indicator {
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            color: var(--color-accent-green);
+            background: rgba(76, 175, 80, 0.1);
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius-sm);
+        }
+
+        .deduction-indicator.caution {
+            color: var(--color-accent-orange);
+            background: rgba(250, 93, 41, 0.1);
+        }
+
+        .tds-badge {
+            font-size: var(--font-size-xs);
+            font-weight: 500;
+            color: #fff;
+            background: var(--color-accent-purple);
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            margin-left: var(--space-1);
+        }
+
+        .business-type-section {
+            transition: var(--transition-base);
+        }
+
+        .business-type-section.hidden {
+            display: none;
+        }
+
         /* ============================================
            BUTTONS
            ============================================ */
@@ -935,36 +982,6 @@
         }
 
         /* ============================================
-           REGIME TOGGLE
-           ============================================ */
-        .regime-toggle {
-            display: flex;
-            background: var(--color-neutral-200);
-            border-radius: var(--radius-full);
-            padding: var(--space-1);
-            margin-bottom: var(--space-6);
-        }
-
-        .regime-toggle-btn {
-            flex: 1;
-            padding: var(--space-3) var(--space-6);
-            border: none;
-            border-radius: var(--radius-full);
-            font-size: var(--font-size-sm);
-            font-weight: 600;
-            cursor: pointer;
-            background: transparent;
-            color: var(--color-neutral-500);
-            transition: var(--transition-base);
-        }
-
-        .regime-toggle-btn.active {
-            background: var(--color-primary-500);
-            color: #fff;
-            box-shadow: var(--shadow-md);
-        }
-
-        /* ============================================
            TABLES
            ============================================ */
         .data-table {
@@ -1007,16 +1024,96 @@
         }
 
         /* ============================================
+           ACCESSIBILITY
+           ============================================ */
+        /* Skip to main content link */
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 0;
+            background: var(--color-primary-900);
+            color: #fff;
+            padding: var(--space-3) var(--space-4);
+            z-index: 1000;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .skip-link:focus {
+            top: var(--space-2);
+            left: var(--space-2);
+        }
+
+        /* Enhanced focus styles */
+        :focus-visible {
+            outline: 3px solid var(--color-accent-orange);
+            outline-offset: 2px;
+        }
+
+        .form-input:focus-visible,
+        .form-select:focus-visible {
+            outline: none;
+            border-color: var(--color-primary-500);
+            box-shadow: 0 0 0 4px rgba(74, 144, 217, 0.25);
+        }
+
+        .btn:focus-visible {
+            outline-offset: 3px;
+        }
+
+        .assessee-card:focus-visible,
+        .income-source-card:focus-visible {
+            outline: 3px solid var(--color-accent-orange);
+            outline-offset: 2px;
+        }
+
+        /* Screen reader only text */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Reduced motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* High contrast mode adjustments */
+        @media (prefers-contrast: high) {
+            .form-input, .form-select {
+                border-width: 3px;
+            }
+            .card {
+                border-width: 2px;
+            }
+        }
+
+        /* ============================================
            PRINT STYLES
            ============================================ */
         @media print {
             body { background: #fff; }
-            .wizard-header, .wizard-nav, .btn { display: none; }
+            .wizard-header, .wizard-nav, .btn, .skip-link { display: none; }
             .wizard-container { box-shadow: none; }
+            .depreciation-tool, .indexation-tool { page-break-inside: avoid; }
         }
     </style>
 </head>
 <body>
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <div class="app-container">
         <!-- Header -->
         <header class="app-header">
@@ -1032,32 +1129,32 @@
         </header>
 
         <!-- Wizard Container -->
-        <div class="wizard-container">
+        <main id="main-content" class="wizard-container" role="main">
             <!-- Wizard Steps Header -->
-            <div class="wizard-header">
-                <div class="wizard-steps">
-                    <div class="wizard-step active" data-step="1" onclick="goToStep(1)">
-                        <div class="step-circle"><span class="step-number">1</span></div>
+            <nav class="wizard-header" aria-label="Tax calculation steps">
+                <ol class="wizard-steps" role="list">
+                    <li class="wizard-step active" data-step="1" onclick="goToStep(1)" tabindex="0" role="button" aria-current="step" aria-label="Step 1: Profile Setup">
+                        <div class="step-circle" aria-hidden="true"><span class="step-number">1</span></div>
                         <div class="step-label">Profile</div>
-                    </div>
-                    <div class="wizard-step" data-step="2" onclick="goToStep(2)">
-                        <div class="step-circle"><span class="step-number">2</span></div>
+                    </li>
+                    <li class="wizard-step" data-step="2" onclick="goToStep(2)" tabindex="0" role="button" aria-label="Step 2: Income Sources">
+                        <div class="step-circle" aria-hidden="true"><span class="step-number">2</span></div>
                         <div class="step-label">Income Sources</div>
-                    </div>
-                    <div class="wizard-step" data-step="3" onclick="goToStep(3)">
-                        <div class="step-circle"><span class="step-number">3</span></div>
+                    </li>
+                    <li class="wizard-step" data-step="3" onclick="goToStep(3)" tabindex="0" role="button" aria-label="Step 3: Income Details">
+                        <div class="step-circle" aria-hidden="true"><span class="step-number">3</span></div>
                         <div class="step-label">Income Details</div>
-                    </div>
-                    <div class="wizard-step" data-step="4" onclick="goToStep(4)">
-                        <div class="step-circle"><span class="step-number">4</span></div>
+                    </li>
+                    <li class="wizard-step" data-step="4" onclick="goToStep(4)" tabindex="0" role="button" aria-label="Step 4: Deductions">
+                        <div class="step-circle" aria-hidden="true"><span class="step-number">4</span></div>
                         <div class="step-label">Deductions</div>
-                    </div>
-                    <div class="wizard-step" data-step="5" onclick="goToStep(5)">
-                        <div class="step-circle"><span class="step-number">5</span></div>
+                    </li>
+                    <li class="wizard-step" data-step="5" onclick="goToStep(5)" tabindex="0" role="button" aria-label="Step 5: Results">
+                        <div class="step-circle" aria-hidden="true"><span class="step-number">5</span></div>
                         <div class="step-label">Results</div>
-                    </div>
-                </div>
-            </div>
+                    </li>
+                </ol>
+            </nav>
 
             <!-- Wizard Content -->
             <div class="wizard-content">
@@ -1127,36 +1224,9 @@
                         </div>
                     </div>
 
-                    <!-- Tax Regime Preference -->
-                    <div class="card">
-                        <h3 class="card-title"><span class="icon">⚖️</span> Tax Regime Preference</h3>
-                        <div class="alert alert-info">
-                            <strong>Note:</strong> New Tax Regime is default from FY 2023-24. You can opt for Old Regime to claim deductions under Chapter VI-A.
-                        </div>
-                        <div class="regime-toggle">
-                            <button class="regime-toggle-btn active" data-regime="new" onclick="selectRegime('new')">New Tax Regime</button>
-                            <button class="regime-toggle-btn" data-regime="old" onclick="selectRegime('old')">Old Tax Regime</button>
-                        </div>
-                        <div class="form-row cols-2">
-                            <div>
-                                <h4 style="margin-bottom: var(--space-2); color: var(--color-new-regime);">New Regime Benefits</h4>
-                                <ul style="font-size: var(--font-size-sm); color: var(--color-neutral-500); padding-left: var(--space-5);">
-                                    <li>Lower tax rates</li>
-                                    <li>₹75,000 standard deduction</li>
-                                    <li>No rebate filing required up to ₹7L</li>
-                                    <li>Simpler compliance</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h4 style="margin-bottom: var(--space-2); color: var(--color-old-regime);">Old Regime Benefits</h4>
-                                <ul style="font-size: var(--font-size-sm); color: var(--color-neutral-500); padding-left: var(--space-5);">
-                                    <li>80C deductions (₹1.5L)</li>
-                                    <li>HRA exemption</li>
-                                    <li>Home loan interest (₹2L)</li>
-                                    <li>80D health insurance</li>
-                                </ul>
-                            </div>
-                        </div>
+                    <!-- Regime Comparison Info -->
+                    <div class="alert alert-info" style="margin-bottom: var(--space-6);">
+                        <strong>📊 Comparison Tool:</strong> This calculator compares BOTH tax regimes and recommends the one with lower tax liability. Enter your deductions in Step 4 to see accurate comparison.
                     </div>
 
                     <!-- Navigation -->
@@ -1362,7 +1432,114 @@
                     </div>
 
                     <!-- Actions -->
+                    <!-- Form 26AS TDS Reconciliation -->
+                    <div class="card" style="margin-top: var(--space-8);">
+                        <h3 class="card-title"><span class="icon">📋</span> Form 26AS / AIS Reconciliation</h3>
+                        <p style="font-size: var(--font-size-sm); color: var(--color-neutral-500); margin-bottom: var(--space-4);">
+                            Enter TDS amounts from your Form 26AS/AIS to calculate your final tax payable or refund due.
+                        </p>
+
+                        <div class="form-row cols-3">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    TDS on Salary (Sec 192)
+                                    <span class="hint">From Form 16</span>
+                                </label>
+                                <div class="input-currency">
+                                    <input type="number" class="form-input" id="tds192" placeholder="0" value="0" oninput="updateTDSReconciliation()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    TDS on Interest (Sec 194A)
+                                    <span class="hint">FD, RD interest</span>
+                                </label>
+                                <div class="input-currency">
+                                    <input type="number" class="form-input" id="tds194A" placeholder="0" value="0" oninput="updateTDSReconciliation()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    TDS on Dividends (Sec 194)
+                                    <span class="hint">From companies</span>
+                                </label>
+                                <div class="input-currency">
+                                    <input type="number" class="form-input" id="tds194" placeholder="0" value="0" oninput="updateTDSReconciliation()">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row cols-3">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    TDS on Professional Fees (Sec 194J)
+                                    <span class="hint">Freelance income</span>
+                                </label>
+                                <div class="input-currency">
+                                    <input type="number" class="form-input" id="tds194J" placeholder="0" value="0" oninput="updateTDSReconciliation()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    TDS on Rent (Sec 194I/194IB)
+                                    <span class="hint">Rental income</span>
+                                </label>
+                                <div class="input-currency">
+                                    <input type="number" class="form-input" id="tds194I" placeholder="0" value="0" oninput="updateTDSReconciliation()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Other TDS / TCS
+                                    <span class="hint">Any other deductions</span>
+                                </label>
+                                <div class="input-currency">
+                                    <input type="number" class="form-input" id="tdsOther" placeholder="0" value="0" oninput="updateTDSReconciliation()">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row cols-2">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Advance Tax Paid
+                                    <span class="hint">Self-assessment payments</span>
+                                </label>
+                                <div class="input-currency">
+                                    <input type="number" class="form-input" id="advanceTax" placeholder="0" value="0" oninput="updateTDSReconciliation()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Self-Assessment Tax (Challan 280)
+                                    <span class="hint">Tax paid before filing</span>
+                                </label>
+                                <div class="input-currency">
+                                    <input type="number" class="form-input" id="selfAssessment" placeholder="0" value="0" oninput="updateTDSReconciliation()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reconciliation Summary -->
+                        <div id="tds-reconciliation-summary" style="margin-top: var(--space-4); padding: var(--space-4); border-radius: var(--radius-md); background: var(--color-neutral-200);">
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); text-align: center;">
+                                <div>
+                                    <div style="font-size: var(--font-size-sm); color: var(--color-neutral-500);">Total Tax Liability</div>
+                                    <div id="recTaxLiability" style="font-size: var(--font-size-xl); font-weight: 700; color: var(--color-accent-red);">₹0</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: var(--font-size-sm); color: var(--color-neutral-500);">Total TDS/Tax Paid</div>
+                                    <div id="recTotalPaid" style="font-size: var(--font-size-xl); font-weight: 700; color: var(--color-accent-green);">₹0</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: var(--font-size-sm); color: var(--color-neutral-500);">Balance</div>
+                                    <div id="recBalance" style="font-size: var(--font-size-xl); font-weight: 700;">₹0</div>
+                                </div>
+                            </div>
+                            <div id="recMessage" style="margin-top: var(--space-4); padding: var(--space-3); border-radius: var(--radius-md); text-align: center; font-weight: 600;"></div>
+                        </div>
+                    </div>
+
                     <div style="display: flex; gap: var(--space-4); justify-content: center; margin-top: var(--space-6);">
+                        <button class="btn btn-primary" onclick="exportToPDF()">📄 Export PDF</button>
                         <button class="btn btn-outline" onclick="window.print()">🖨️ Print</button>
                         <button class="btn btn-secondary" onclick="goToStep(1)">🔄 Start Over</button>
                     </div>
@@ -1381,7 +1558,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <script>
@@ -1394,7 +1571,6 @@
             residentialStatus: 'resident',
             ageGroup: 'general',
             financialYear: '2024-25',
-            regimePreference: 'new',
 
             incomeSources: {
                 salary: false,
@@ -1560,19 +1736,6 @@
             } else {
                 ageField.classList.add('hidden');
             }
-
-            saveState();
-        }
-
-        function selectRegime(regime) {
-            TaxState.regimePreference = regime;
-
-            document.querySelectorAll('.regime-toggle-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.dataset.regime === regime) {
-                    btn.classList.add('active');
-                }
-            });
 
             saveState();
         }
@@ -1768,47 +1931,345 @@
         function renderBusinessSection() {
             return `
                 <div class="section-accordion">
-                    <div class="section-header" onclick="toggleSectionAccordion(this)">
+                    <div class="section-header open" onclick="toggleSectionAccordion(this)">
                         <h3>📊 Business / Profession Income (Section 28-44)</h3>
                         <div class="section-toggle">▼</div>
                     </div>
-                    <div class="section-body">
+                    <div class="section-body open">
                         <div class="section-body-inner">
                             <div class="form-group">
                                 <label class="form-label">Business Type</label>
                                 <select class="form-select" id="businessType" onchange="toggleBusinessType()">
-                                    <option value="presumptive44AD">Presumptive - Sec 44AD (Business)</option>
-                                    <option value="presumptive44ADA">Presumptive - Sec 44ADA (Profession)</option>
-                                    <option value="regular">Regular Business (Books)</option>
+                                    <option value="presumptive44AD">Presumptive - Sec 44AD (Business up to ₹3Cr)</option>
+                                    <option value="presumptive44ADA">Presumptive - Sec 44ADA (Profession up to ₹75L)</option>
+                                    <option value="presumptive44AE">Presumptive - Sec 44AE (Goods Transport)</option>
+                                    <option value="regular">Regular Business (Maintain Books)</option>
                                 </select>
                             </div>
 
                             <!-- Presumptive 44AD -->
-                            <div id="section-44ad">
+                            <div id="section-44ad" class="business-type-section">
                                 <div class="alert alert-info">
-                                    <strong>Section 44AD:</strong> For businesses with turnover up to ₹3Cr (if 95% digital) or ₹2Cr.
-                                    Digital receipts taxed at 6%, cash at 8%.
+                                    <strong>Section 44AD:</strong> For eligible businesses with turnover up to ₹3Cr (if 95% digital) or ₹2Cr.
+                                    <br>Digital receipts taxed at 6%, cash at 8% of turnover.
                                 </div>
                                 <div class="form-row cols-2">
                                     <div class="form-group">
-                                        <label class="form-label">Gross Turnover / Receipts</label>
+                                        <label class="form-label">Total Gross Turnover / Receipts</label>
                                         <div class="input-currency">
-                                            <input type="number" class="form-input" id="turnover44AD" placeholder="0" value="0">
+                                            <input type="number" class="form-input" id="turnover44AD" placeholder="0" value="0" oninput="updateBusinessSummary()">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">
                                             Digital Receipts (Bank/UPI)
-                                            <span class="hint">Taxed at 6%</span>
+                                            <span class="hint">Taxed at 6% rate</span>
                                         </label>
                                         <div class="input-currency">
-                                            <input type="number" class="form-input" id="digital44AD" placeholder="0" value="0">
+                                            <input type="number" class="form-input" id="digital44AD" placeholder="0" value="0" oninput="updateBusinessSummary()">
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="alert alert-success" id="business-summary">
+                            <!-- Presumptive 44ADA -->
+                            <div id="section-44ada" class="business-type-section hidden">
+                                <div class="alert alert-info">
+                                    <strong>Section 44ADA:</strong> For professionals (doctors, lawyers, architects, CAs, etc.) with gross receipts up to ₹75L.
+                                    <br>50% of receipts treated as profit.
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Gross Professional Receipts</label>
+                                    <div class="input-currency">
+                                        <input type="number" class="form-input" id="receipts44ADA" placeholder="0" value="0" oninput="updateBusinessSummary()">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Presumptive 44AE -->
+                            <div id="section-44ae" class="business-type-section hidden">
+                                <div class="alert alert-info">
+                                    <strong>Section 44AE:</strong> For goods carriage owners (up to 10 vehicles).
+                                    <br>Heavy: ₹1,000/ton/month | Light: ₹7,500/vehicle/month
+                                </div>
+                                <div class="form-row cols-2">
+                                    <div class="form-group">
+                                        <label class="form-label">Heavy Vehicles (Tons capacity)</label>
+                                        <input type="number" class="form-input" id="heavyVehicleTons" placeholder="Total tons" value="0" oninput="updateBusinessSummary()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Light Vehicles (Count)</label>
+                                        <input type="number" class="form-input" id="lightVehicleCount" placeholder="Number of vehicles" value="0" oninput="updateBusinessSummary()">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Months Operated (1-12)</label>
+                                    <input type="number" class="form-input" id="vehicleMonths" placeholder="12" value="12" min="1" max="12" oninput="updateBusinessSummary()">
+                                </div>
+                            </div>
+
+                            <!-- Regular Business with Expense Tracking -->
+                            <div id="section-regular" class="business-type-section hidden">
+                                <div class="alert alert-warning">
+                                    <strong>Regular Books:</strong> Maintain proper books of accounts. Audit required if turnover exceeds ₹1Cr (₹10Cr if 95% digital).
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Gross Business Income / Receipts</label>
+                                    <div class="input-currency">
+                                        <input type="number" class="form-input" id="grossBusinessIncome" placeholder="0" value="0" oninput="updateBusinessSummary()">
+                                    </div>
+                                </div>
+
+                                <h4 style="margin: var(--space-6) 0 var(--space-4); color: var(--color-primary-900); border-bottom: 2px solid var(--color-neutral-300); padding-bottom: var(--space-2);">
+                                    Business Expenses <span style="font-weight: normal; font-size: var(--font-size-sm); color: var(--color-neutral-500);">(Ordered by Audit Evidence Strength)</span>
+                                </h4>
+
+                                <!-- TIER 1: Bank/Electronic Evidence (Strongest) -->
+                                <div class="expense-category tier-1">
+                                    <div class="expense-header">
+                                        <span class="evidence-badge tier-1">🏦 Tier 1: Bank Evidence</span>
+                                        <span class="deduction-indicator">100% Deductible</span>
+                                    </div>
+                                    <p class="expense-desc">Expenses with clear bank statements/electronic trail - strongest audit evidence</p>
+
+                                    <div class="form-row cols-2">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                Salaries & Wages <span class="tds-badge">TDS 194C</span>
+                                            </label>
+                                            <div class="input-currency">
+                                                <input type="number" class="form-input" id="expSalaries" placeholder="0" value="0" oninput="updateBusinessSummary()">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                Rent Paid <span class="tds-badge">TDS 194I</span>
+                                                <span class="limit">TDS if >₹2.4L/year</span>
+                                            </label>
+                                            <div class="input-currency">
+                                                <input type="number" class="form-input" id="expRent" placeholder="0" value="0" oninput="updateBusinessSummary()">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row cols-2">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                Professional / Legal Fees <span class="tds-badge">TDS 194J</span>
+                                            </label>
+                                            <div class="input-currency">
+                                                <input type="number" class="form-input" id="expProfessional" placeholder="0" value="0" oninput="updateBusinessSummary()">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                Interest on Business Loans <span class="tds-badge">TDS 194A</span>
+                                            </label>
+                                            <div class="input-currency">
+                                                <input type="number" class="form-input" id="expInterest" placeholder="0" value="0" oninput="updateBusinessSummary()">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- TIER 2: GST Invoice Evidence -->
+                                <div class="expense-category tier-2">
+                                    <div class="expense-header">
+                                        <span class="evidence-badge tier-2">📋 Tier 2: GST Invoices</span>
+                                        <span class="deduction-indicator">100% Deductible</span>
+                                    </div>
+                                    <p class="expense-desc">Expenses with proper GST invoices - verified via GSTR-2A/2B</p>
+
+                                    <div class="form-row cols-3">
+                                        <div class="form-group">
+                                            <label class="form-label">Electricity & Utilities</label>
+                                            <div class="input-currency">
+                                                <input type="number" class="form-input" id="expUtilities" placeholder="0" value="0" oninput="updateBusinessSummary()">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Telephone & Internet</label>
+                                            <div class="input-currency">
+                                                <input type="number" class="form-input" id="expTelephone" placeholder="0" value="0" oninput="updateBusinessSummary()">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Materials & Supplies</label>
+                                            <div class="input-currency">
+                                                <input type="number" class="form-input" id="expMaterials" placeholder="0" value="0" oninput="updateBusinessSummary()">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row cols-2">
+                                        <div class="form-group">
+                                            <label class="form-label">Marketing & Advertising</label>
+                                            <div class="input-currency">
+                                                <input type="number" class="form-input" id="expMarketing" placeholder="0" value="0" oninput="updateBusinessSummary()">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Software & Subscriptions</label>
+                                            <div class="input-currency">
+                                                <input type="number" class="form-input" id="expSoftware" placeholder="0" value="0" oninput="updateBusinessSummary()">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- TIER 3: Agreement/Bill Evidence -->
+                                <div class="expense-category tier-3">
+                                    <div class="expense-header">
+                                        <span class="evidence-badge tier-3">📄 Tier 3: Agreements/Bills</span>
+                                        <span class="deduction-indicator">100% Deductible</span>
+                                    </div>
+                                    <p class="expense-desc">Expenses with signed agreements or proper bills - require supporting documents</p>
+
+                                    <div class="form-row cols-3">
+                                        <div class="form-group">
+                                            <label class="form-label">Travel & Conveyance</label>
+                                            <div class="input-currency">
+                                                <input type="number" class="form-input" id="expTravel" placeholder="0" value="0" oninput="updateBusinessSummary()">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Repairs & Maintenance</label>
+                                            <div class="input-currency">
+                                                <input type="number" class="form-input" id="expRepairs" placeholder="0" value="0" oninput="updateBusinessSummary()">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Insurance Premiums</label>
+                                            <div class="input-currency">
+                                                <input type="number" class="form-input" id="expInsurance" placeholder="0" value="0" oninput="updateBusinessSummary()">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row cols-2">
+                                        <div class="form-group">
+                                            <label class="form-label">Printing & Stationery</label>
+                                            <div class="input-currency">
+                                                <input type="number" class="form-input" id="expStationery" placeholder="0" value="0" oninput="updateBusinessSummary()">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Staff Welfare</label>
+                                            <div class="input-currency">
+                                                <input type="number" class="form-input" id="expWelfare" placeholder="0" value="0" oninput="updateBusinessSummary()">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- TIER 4: Computed/Calculated -->
+                                <div class="expense-category tier-4">
+                                    <div class="expense-header">
+                                        <span class="evidence-badge tier-4">🔢 Tier 4: Computed</span>
+                                        <span class="deduction-indicator">Per IT Act Rules</span>
+                                    </div>
+                                    <p class="expense-desc">Calculated deductions based on asset register - requires depreciation schedule</p>
+
+                                    <div class="form-row cols-2">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                Depreciation (WDV Method)
+                                                <span class="hint">Use Depreciation Calculator tool</span>
+                                            </label>
+                                            <div class="input-currency">
+                                                <input type="number" class="form-input" id="expDepreciation" placeholder="0" value="0" oninput="updateBusinessSummary()">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                Bad Debts Written Off
+                                                <span class="hint">Actual only, no provisions</span>
+                                            </label>
+                                            <div class="input-currency">
+                                                <input type="number" class="form-input" id="expBadDebts" placeholder="0" value="0" oninput="updateBusinessSummary()">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- TIER 5: Estimates/Provisions (Weakest) -->
+                                <div class="expense-category tier-5">
+                                    <div class="expense-header">
+                                        <span class="evidence-badge tier-5">⚠️ Tier 5: Estimates</span>
+                                        <span class="deduction-indicator caution">Review Required</span>
+                                    </div>
+                                    <p class="expense-desc">Miscellaneous expenses - keep minimal, ensure proper vouchers. Cash payments >₹10K disallowed (Sec 40A(3))</p>
+
+                                    <div class="form-row cols-2">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                Other Miscellaneous Expenses
+                                                <span class="limit">⚠️ Cash >₹10K disallowed</span>
+                                            </label>
+                                            <div class="input-currency">
+                                                <input type="number" class="form-input" id="expMiscellaneous" placeholder="0" value="0" oninput="updateBusinessSummary()">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                Entertainment (Partial Deduction)
+                                                <span class="hint">Often scrutinized</span>
+                                            </label>
+                                            <div class="input-currency">
+                                                <input type="number" class="form-input" id="expEntertainment" placeholder="0" value="0" oninput="updateBusinessSummary()">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Expense Summary -->
+                                <div class="expense-summary-box" style="margin-top: var(--space-6); background: var(--color-neutral-200); border-radius: var(--radius-md); padding: var(--space-4);">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-2);">
+                                        <div>
+                                            <span style="color: var(--color-neutral-500); font-size: var(--font-size-sm);">Total Expenses</span>
+                                            <div id="totalExpenses" style="font-size: var(--font-size-xl); font-weight: 700; color: var(--color-primary-900);">₹0</div>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <span style="color: var(--color-neutral-500); font-size: var(--font-size-sm);">Net Business Income</span>
+                                            <div id="netBusinessIncome" style="font-size: var(--font-size-xl); font-weight: 700; color: var(--color-accent-green);">₹0</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Depreciation Calculator Tool -->
+                                <div class="depreciation-tool" style="margin-top: var(--space-6); background: linear-gradient(135deg, rgba(255, 152, 0, 0.08) 0%, rgba(255, 152, 0, 0.02) 100%); border: 1px solid var(--tier-3); border-radius: var(--radius-lg); padding: var(--space-5);">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4);">
+                                        <div style="display: flex; align-items: center; gap: var(--space-2);">
+                                            <span style="font-size: 1.5rem;">🏗️</span>
+                                            <h4 style="color: var(--color-primary-900); margin: 0;">Depreciation Calculator (WDV Method)</h4>
+                                        </div>
+                                        <button class="btn btn-secondary" style="padding: var(--space-2) var(--space-3); font-size: var(--font-size-sm);" onclick="addAsset()">+ Add Asset</button>
+                                    </div>
+                                    <p style="font-size: var(--font-size-sm); color: var(--color-neutral-500); margin-bottom: var(--space-4);">
+                                        Add your business assets to calculate depreciation under Written Down Value (WDV) method as per Income Tax Act.
+                                    </p>
+
+                                    <div id="asset-register">
+                                        <!-- Assets will be added here dynamically -->
+                                    </div>
+
+                                    <div id="no-assets-msg" style="text-align: center; padding: var(--space-6); color: var(--color-neutral-400);">
+                                        <div style="font-size: 2rem; margin-bottom: var(--space-2);">📋</div>
+                                        <p>No assets added yet. Click "Add Asset" to start building your asset register.</p>
+                                    </div>
+
+                                    <!-- Depreciation Summary -->
+                                    <div id="depreciation-summary" class="hidden" style="margin-top: var(--space-4); background: var(--color-neutral-100); border-radius: var(--radius-md); padding: var(--space-4);">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-2);">
+                                            <div>
+                                                <span style="color: var(--color-neutral-500); font-size: var(--font-size-sm);">Total Depreciation</span>
+                                                <div id="totalDepreciation" style="font-size: var(--font-size-xl); font-weight: 700; color: var(--tier-4);">₹0</div>
+                                            </div>
+                                            <button class="btn btn-primary" style="font-size: var(--font-size-sm);" onclick="applyDepreciation()">Apply to Expenses ↑</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-success" id="business-summary" style="margin-top: var(--space-4);">
                                 <strong>Business Income:</strong> Deemed Profit: ₹0
                             </div>
                         </div>
@@ -1820,20 +2281,23 @@
         function renderCapitalGainsSection() {
             return `
                 <div class="section-accordion">
-                    <div class="section-header" onclick="toggleSectionAccordion(this)">
+                    <div class="section-header open" onclick="toggleSectionAccordion(this)">
                         <h3>📈 Capital Gains</h3>
                         <div class="section-toggle">▼</div>
                     </div>
-                    <div class="section-body">
+                    <div class="section-body open">
                         <div class="section-body-inner">
                             <div class="alert alert-warning">
                                 <strong>Budget 2024 Rates:</strong> STCG 111A: 20% | LTCG 112A: 12.5% (₹1.25L exempt) | Other LTCG: 12.5%
+                                <br><span style="font-size: var(--font-size-xs);">Note: For assets acquired before 23 July 2024, you can opt for 20% with indexation OR 12.5% without indexation - whichever is beneficial.</span>
                             </div>
-                            <div class="form-row cols-3">
+
+                            <h4 style="margin: var(--space-4) 0 var(--space-3); color: var(--color-primary-900);">Short-Term Capital Gains</h4>
+                            <div class="form-row cols-2">
                                 <div class="form-group">
                                     <label class="form-label">
                                         STCG on Equity (Sec 111A)
-                                        <span class="hint">@20%</span>
+                                        <span class="hint">@20% (listed securities with STT)</span>
                                     </label>
                                     <div class="input-currency">
                                         <input type="number" class="form-input" id="stcg111A" placeholder="0" value="0">
@@ -1841,8 +2305,21 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">
+                                        Other STCG
+                                        <span class="hint">Added to income, taxed at slab rate</span>
+                                    </label>
+                                    <div class="input-currency">
+                                        <input type="number" class="form-input" id="stcgOther" placeholder="0" value="0">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h4 style="margin: var(--space-6) 0 var(--space-3); color: var(--color-primary-900);">Long-Term Capital Gains</h4>
+                            <div class="form-row cols-2">
+                                <div class="form-group">
+                                    <label class="form-label">
                                         LTCG on Equity (Sec 112A)
-                                        <span class="hint">@12.5% above ₹1.25L</span>
+                                        <span class="hint">@12.5% above ₹1.25L exemption</span>
                                     </label>
                                     <div class="input-currency">
                                         <input type="number" class="form-input" id="ltcg112A" placeholder="0" value="0">
@@ -1851,20 +2328,142 @@
                                 <div class="form-group">
                                     <label class="form-label">
                                         Other LTCG (Sec 112)
-                                        <span class="hint">@12.5%</span>
+                                        <span class="hint">@12.5% (property, gold, etc.)</span>
                                     </label>
                                     <div class="input-currency">
                                         <input type="number" class="form-input" id="ltcgOther" placeholder="0" value="0">
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">Other Short-Term Capital Gains</label>
-                                <div class="input-currency">
-                                    <input type="number" class="form-input" id="stcgOther" placeholder="0" value="0">
+
+                            <!-- LTCG Indexation Comparison Tool -->
+                            <div class="indexation-tool" style="margin-top: var(--space-6); background: linear-gradient(135deg, rgba(74, 144, 217, 0.08) 0%, rgba(74, 144, 217, 0.02) 100%); border: 1px solid var(--color-primary-300); border-radius: var(--radius-lg); padding: var(--space-5);">
+                                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-4);">
+                                    <span style="font-size: 1.5rem;">🧮</span>
+                                    <h4 style="color: var(--color-primary-900); margin: 0;">LTCG Indexation Comparison Tool</h4>
+                                </div>
+                                <p style="font-size: var(--font-size-sm); color: var(--color-neutral-500); margin-bottom: var(--space-4);">
+                                    For property/gold/debt funds acquired before 23 July 2024, compare: <strong>20% with indexation</strong> vs <strong>12.5% without indexation</strong>
+                                </p>
+
+                                <div class="form-row cols-3">
+                                    <div class="form-group">
+                                        <label class="form-label">Purchase Price</label>
+                                        <div class="input-currency">
+                                            <input type="number" class="form-input" id="indexPurchasePrice" placeholder="0" value="0" oninput="calculateIndexation()">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Sale Price</label>
+                                        <div class="input-currency">
+                                            <input type="number" class="form-input" id="indexSalePrice" placeholder="0" value="0" oninput="calculateIndexation()">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Improvement Costs (Optional)</label>
+                                        <div class="input-currency">
+                                            <input type="number" class="form-input" id="indexImprovement" placeholder="0" value="0" oninput="calculateIndexation()">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row cols-2">
+                                    <div class="form-group">
+                                        <label class="form-label">Year of Purchase</label>
+                                        <select class="form-select" id="indexPurchaseYear" onchange="calculateIndexation()">
+                                            <option value="">Select Year</option>
+                                            <option value="2001-02">FY 2001-02 (CII: 100)</option>
+                                            <option value="2002-03">FY 2002-03 (CII: 105)</option>
+                                            <option value="2003-04">FY 2003-04 (CII: 109)</option>
+                                            <option value="2004-05">FY 2004-05 (CII: 113)</option>
+                                            <option value="2005-06">FY 2005-06 (CII: 117)</option>
+                                            <option value="2006-07">FY 2006-07 (CII: 122)</option>
+                                            <option value="2007-08">FY 2007-08 (CII: 129)</option>
+                                            <option value="2008-09">FY 2008-09 (CII: 137)</option>
+                                            <option value="2009-10">FY 2009-10 (CII: 148)</option>
+                                            <option value="2010-11">FY 2010-11 (CII: 167)</option>
+                                            <option value="2011-12">FY 2011-12 (CII: 184)</option>
+                                            <option value="2012-13">FY 2012-13 (CII: 200)</option>
+                                            <option value="2013-14">FY 2013-14 (CII: 220)</option>
+                                            <option value="2014-15">FY 2014-15 (CII: 240)</option>
+                                            <option value="2015-16">FY 2015-16 (CII: 254)</option>
+                                            <option value="2016-17">FY 2016-17 (CII: 264)</option>
+                                            <option value="2017-18">FY 2017-18 (CII: 272)</option>
+                                            <option value="2018-19">FY 2018-19 (CII: 280)</option>
+                                            <option value="2019-20">FY 2019-20 (CII: 289)</option>
+                                            <option value="2020-21">FY 2020-21 (CII: 301)</option>
+                                            <option value="2021-22">FY 2021-22 (CII: 317)</option>
+                                            <option value="2022-23">FY 2022-23 (CII: 331)</option>
+                                            <option value="2023-24">FY 2023-24 (CII: 348)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Year of Sale</label>
+                                        <select class="form-select" id="indexSaleYear" onchange="calculateIndexation()">
+                                            <option value="2024-25" selected>FY 2024-25 (CII: 363)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Indexation Results -->
+                                <div id="indexation-results" class="hidden" style="margin-top: var(--space-4);">
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                                        <div style="background: rgba(33, 150, 243, 0.1); border: 1px solid var(--color-old-regime); border-radius: var(--radius-md); padding: var(--space-4);">
+                                            <h5 style="color: var(--color-old-regime); margin-bottom: var(--space-2);">With Indexation (20%)</h5>
+                                            <div style="font-size: var(--font-size-sm); color: var(--color-neutral-500);">
+                                                <div>Indexed Cost: <span id="indexedCost">₹0</span></div>
+                                                <div>Indexed Gain: <span id="indexedGain">₹0</span></div>
+                                                <div style="font-weight: 700; color: var(--color-old-regime); margin-top: var(--space-2);">Tax: <span id="indexedTax">₹0</span></div>
+                                            </div>
+                                        </div>
+                                        <div style="background: rgba(76, 175, 80, 0.1); border: 1px solid var(--color-new-regime); border-radius: var(--radius-md); padding: var(--space-4);">
+                                            <h5 style="color: var(--color-new-regime); margin-bottom: var(--space-2);">Without Indexation (12.5%)</h5>
+                                            <div style="font-size: var(--font-size-sm); color: var(--color-neutral-500);">
+                                                <div>Actual Cost: <span id="actualCost">₹0</span></div>
+                                                <div>Actual Gain: <span id="actualGain">₹0</span></div>
+                                                <div style="font-weight: 700; color: var(--color-new-regime); margin-top: var(--space-2);">Tax: <span id="actualTax">₹0</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="indexation-recommendation" style="margin-top: var(--space-4); padding: var(--space-3); border-radius: var(--radius-md); font-weight: 600; text-align: center;"></div>
                                 </div>
                             </div>
-                            <div class="alert alert-success" id="capital-summary">
+
+                            <!-- Exemption Sections -->
+                            <div style="margin-top: var(--space-6);">
+                                <h4 style="color: var(--color-primary-900); margin-bottom: var(--space-3);">Capital Gains Exemptions (Optional)</h4>
+                                <div class="form-row cols-3">
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            Sec 54 (Residential House)
+                                            <span class="hint">Reinvest in new house</span>
+                                        </label>
+                                        <div class="input-currency">
+                                            <input type="number" class="form-input" id="exemption54" placeholder="0" value="0">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            Sec 54EC (Bonds)
+                                            <span class="hint">Invest in NHAI/REC bonds</span>
+                                            <span class="limit">Max ₹50L</span>
+                                        </label>
+                                        <div class="input-currency">
+                                            <input type="number" class="form-input" id="exemption54EC" placeholder="0" value="0" max="5000000">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            Sec 54F (Any Asset)
+                                            <span class="hint">Reinvest in residential house</span>
+                                        </label>
+                                        <div class="input-currency">
+                                            <input type="number" class="form-input" id="exemption54F" placeholder="0" value="0">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-success" id="capital-summary" style="margin-top: var(--space-4);">
                                 <strong>Capital Gains Tax:</strong> ₹0
                             </div>
                         </div>
@@ -1925,6 +2524,351 @@
             body.classList.toggle('open');
         }
 
+        function toggleBusinessType() {
+            const businessType = document.getElementById('businessType')?.value || 'presumptive44AD';
+            TaxState.business.type = businessType;
+
+            // Hide all business type sections
+            document.querySelectorAll('.business-type-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+
+            // Show relevant section
+            switch (businessType) {
+                case 'presumptive44AD':
+                    document.getElementById('section-44ad')?.classList.remove('hidden');
+                    break;
+                case 'presumptive44ADA':
+                    document.getElementById('section-44ada')?.classList.remove('hidden');
+                    break;
+                case 'presumptive44AE':
+                    document.getElementById('section-44ae')?.classList.remove('hidden');
+                    break;
+                case 'regular':
+                    document.getElementById('section-regular')?.classList.remove('hidden');
+                    break;
+            }
+
+            updateBusinessSummary();
+            saveState();
+        }
+
+        function updateBusinessSummary() {
+            const businessType = document.getElementById('businessType')?.value || 'presumptive44AD';
+            const summaryEl = document.getElementById('business-summary');
+            let profit = 0;
+            let summaryText = '';
+
+            switch (businessType) {
+                case 'presumptive44AD': {
+                    const turnover = getVal('turnover44AD');
+                    const digital = getVal('digital44AD');
+                    const cash = turnover - digital;
+                    profit = (digital * 0.06) + (Math.max(0, cash) * 0.08);
+                    summaryText = `<strong>44AD Presumptive Income:</strong> Digital @ 6%: ${formatCurrency(digital * 0.06)} + Cash @ 8%: ${formatCurrency(Math.max(0, cash) * 0.08)} = <strong>Deemed Profit: ${formatCurrency(profit)}</strong>`;
+                    break;
+                }
+                case 'presumptive44ADA': {
+                    const receipts = getVal('receipts44ADA');
+                    profit = receipts * 0.50;
+                    summaryText = `<strong>44ADA Presumptive Income:</strong> Receipts @ 50% = <strong>Deemed Profit: ${formatCurrency(profit)}</strong>`;
+                    break;
+                }
+                case 'presumptive44AE': {
+                    const heavyTons = getVal('heavyVehicleTons');
+                    const lightCount = getVal('lightVehicleCount');
+                    const months = Math.min(12, Math.max(1, getVal('vehicleMonths') || 12));
+                    const heavyProfit = heavyTons * 1000 * months;
+                    const lightProfit = lightCount * 7500 * months;
+                    profit = heavyProfit + lightProfit;
+                    summaryText = `<strong>44AE Transport Income:</strong> Heavy: ${formatCurrency(heavyProfit)} + Light: ${formatCurrency(lightProfit)} = <strong>Deemed Profit: ${formatCurrency(profit)}</strong>`;
+                    break;
+                }
+                case 'regular': {
+                    const grossIncome = getVal('grossBusinessIncome');
+
+                    // Tier 1 expenses
+                    const expSalaries = getVal('expSalaries');
+                    const expRent = getVal('expRent');
+                    const expProfessional = getVal('expProfessional');
+                    const expInterest = getVal('expInterest');
+
+                    // Tier 2 expenses
+                    const expUtilities = getVal('expUtilities');
+                    const expTelephone = getVal('expTelephone');
+                    const expMaterials = getVal('expMaterials');
+                    const expMarketing = getVal('expMarketing');
+                    const expSoftware = getVal('expSoftware');
+
+                    // Tier 3 expenses
+                    const expTravel = getVal('expTravel');
+                    const expRepairs = getVal('expRepairs');
+                    const expInsurance = getVal('expInsurance');
+                    const expStationery = getVal('expStationery');
+                    const expWelfare = getVal('expWelfare');
+
+                    // Tier 4 expenses
+                    const expDepreciation = getVal('expDepreciation');
+                    const expBadDebts = getVal('expBadDebts');
+
+                    // Tier 5 expenses
+                    const expMiscellaneous = getVal('expMiscellaneous');
+                    const expEntertainment = getVal('expEntertainment');
+
+                    const totalExpenses = expSalaries + expRent + expProfessional + expInterest +
+                        expUtilities + expTelephone + expMaterials + expMarketing + expSoftware +
+                        expTravel + expRepairs + expInsurance + expStationery + expWelfare +
+                        expDepreciation + expBadDebts + expMiscellaneous + expEntertainment;
+
+                    profit = grossIncome - totalExpenses;
+
+                    // Update inline summaries
+                    const totalExpEl = document.getElementById('totalExpenses');
+                    const netIncEl = document.getElementById('netBusinessIncome');
+                    if (totalExpEl) totalExpEl.textContent = formatCurrency(totalExpenses);
+                    if (netIncEl) {
+                        netIncEl.textContent = formatCurrency(profit);
+                        netIncEl.style.color = profit >= 0 ? 'var(--color-accent-green)' : 'var(--color-accent-red)';
+                    }
+
+                    summaryText = `<strong>Regular Business Income:</strong> Gross: ${formatCurrency(grossIncome)} - Expenses: ${formatCurrency(totalExpenses)} = <strong>Net Profit: ${formatCurrency(profit)}</strong>`;
+                    break;
+                }
+            }
+
+            if (summaryEl) {
+                summaryEl.innerHTML = summaryText;
+            }
+
+            // Store for tax calculation
+            TaxState.business.profit = profit;
+            TaxState.business.type = businessType;
+
+            saveState();
+        }
+
+        function updateCapitalGainsSummary() {
+            const summaryEl = document.getElementById('capital-summary');
+            if (!summaryEl) return;
+
+            const stcg111A = getVal('stcg111A');
+            const ltcg112A = getVal('ltcg112A');
+            const ltcgOther = getVal('ltcgOther');
+            const stcgOther = getVal('stcgOther');
+
+            // Exemptions
+            const ex54 = Math.min(getVal('exemption54'), ltcgOther);
+            const ex54EC = Math.min(getVal('exemption54EC'), 5000000, ltcgOther - ex54);
+            const ex54F = Math.min(getVal('exemption54F'), ltcgOther - ex54 - ex54EC);
+            const totalExemptions = ex54 + ex54EC + ex54F;
+
+            // Budget 2024 rates
+            const stcg111ATax = stcg111A * 0.20;
+            const ltcg112AExempt = 125000;
+            const ltcg112ATaxable = Math.max(0, ltcg112A - ltcg112AExempt);
+            const ltcg112ATax = ltcg112ATaxable * 0.125;
+            const ltcgTaxable = Math.max(0, ltcgOther - totalExemptions);
+            const ltcgOtherTax = ltcgTaxable * 0.125;
+
+            const totalCGTax = stcg111ATax + ltcg112ATax + ltcgOtherTax;
+
+            let exemptionText = totalExemptions > 0 ? ` | Exemptions: ${formatCurrency(totalExemptions)}` : '';
+            summaryEl.innerHTML = `<strong>Capital Gains Tax:</strong> STCG 111A @ 20%: ${formatCurrency(stcg111ATax)} | LTCG 112A @ 12.5%: ${formatCurrency(ltcg112ATax)} | Other LTCG @ 12.5%: ${formatCurrency(ltcgOtherTax)}${exemptionText} = <strong>Total CG Tax: ${formatCurrency(totalCGTax)}</strong>`;
+        }
+
+        function calculateIndexation() {
+            const purchasePrice = getVal('indexPurchasePrice');
+            const salePrice = getVal('indexSalePrice');
+            const improvement = getVal('indexImprovement');
+            const purchaseYear = document.getElementById('indexPurchaseYear')?.value;
+            const saleYear = document.getElementById('indexSaleYear')?.value || '2024-25';
+
+            const resultsEl = document.getElementById('indexation-results');
+            const recommendEl = document.getElementById('indexation-recommendation');
+
+            if (!purchasePrice || !salePrice || !purchaseYear) {
+                resultsEl?.classList.add('hidden');
+                return;
+            }
+
+            const purchaseCII = TaxConfig.CII_TABLE[purchaseYear] || 100;
+            const saleCII = TaxConfig.CII_TABLE[saleYear] || 363;
+
+            // Calculate indexed cost
+            const indexedCost = Math.round((purchasePrice * saleCII) / purchaseCII);
+            const indexedImprovement = improvement > 0 ? Math.round((improvement * saleCII) / purchaseCII) : 0;
+            const totalIndexedCost = indexedCost + indexedImprovement;
+
+            // With indexation (20%)
+            const indexedGain = Math.max(0, salePrice - totalIndexedCost);
+            const indexedTax = indexedGain * 0.20;
+
+            // Without indexation (12.5%)
+            const actualCost = purchasePrice + improvement;
+            const actualGain = Math.max(0, salePrice - actualCost);
+            const actualTax = actualGain * 0.125;
+
+            // Update display
+            document.getElementById('indexedCost').textContent = formatCurrency(totalIndexedCost);
+            document.getElementById('indexedGain').textContent = formatCurrency(indexedGain);
+            document.getElementById('indexedTax').textContent = formatCurrency(indexedTax);
+            document.getElementById('actualCost').textContent = formatCurrency(actualCost);
+            document.getElementById('actualGain').textContent = formatCurrency(actualGain);
+            document.getElementById('actualTax').textContent = formatCurrency(actualTax);
+
+            // Recommendation
+            const savings = Math.abs(indexedTax - actualTax);
+            if (indexedTax < actualTax) {
+                recommendEl.innerHTML = `✅ <strong>With Indexation is better!</strong> You save ${formatCurrency(savings)}`;
+                recommendEl.style.background = 'rgba(33, 150, 243, 0.15)';
+                recommendEl.style.color = 'var(--color-old-regime)';
+            } else if (actualTax < indexedTax) {
+                recommendEl.innerHTML = `✅ <strong>Without Indexation is better!</strong> You save ${formatCurrency(savings)}`;
+                recommendEl.style.background = 'rgba(76, 175, 80, 0.15)';
+                recommendEl.style.color = 'var(--color-new-regime)';
+            } else {
+                recommendEl.innerHTML = `⚖️ <strong>Both options result in same tax.</strong>`;
+                recommendEl.style.background = 'var(--color-neutral-200)';
+                recommendEl.style.color = 'var(--color-neutral-600)';
+            }
+
+            resultsEl?.classList.remove('hidden');
+        }
+
+        // ============================================
+        // DEPRECIATION CALCULATOR
+        // ============================================
+        let assetCounter = 0;
+
+        function addAsset() {
+            assetCounter++;
+            const assetRegister = document.getElementById('asset-register');
+            const noAssetsMsg = document.getElementById('no-assets-msg');
+
+            if (noAssetsMsg) noAssetsMsg.classList.add('hidden');
+
+            const assetHtml = `
+                <div class="asset-row" id="asset-${assetCounter}" style="background: var(--color-neutral-100); border-radius: var(--radius-md); padding: var(--space-4); margin-bottom: var(--space-3); border: 1px solid var(--color-neutral-300);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3);">
+                        <span style="font-weight: 600; color: var(--color-primary-900);">Asset #${assetCounter}</span>
+                        <button class="btn" style="background: var(--color-accent-red); color: #fff; padding: var(--space-1) var(--space-2); font-size: var(--font-size-xs);" onclick="removeAsset(${assetCounter})">✕ Remove</button>
+                    </div>
+                    <div class="form-row cols-3" style="margin-bottom: 0;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label">Asset Type</label>
+                            <select class="form-select" id="assetType-${assetCounter}" onchange="calculateAllDepreciation()">
+                                <option value="building5">Building (Residential) - 5%</option>
+                                <option value="building10">Building (Others) - 10%</option>
+                                <option value="furniture">Furniture & Fittings - 10%</option>
+                                <option value="plant15" selected>Plant & Machinery - 15%</option>
+                                <option value="vehicle15">Motor Vehicles - 15%</option>
+                                <option value="vehicle30">Commercial Vehicles - 30%</option>
+                                <option value="computer">Computers & Software - 40%</option>
+                                <option value="intangible">Intangible Assets - 25%</option>
+                                <option value="energy">Energy Saving Devices - 40%</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label">Opening WDV / Cost</label>
+                            <div class="input-currency">
+                                <input type="number" class="form-input" id="assetWDV-${assetCounter}" placeholder="0" value="0" oninput="calculateAllDepreciation()">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label">
+                                Months Used
+                                <span class="hint">Full year = 12, Half = 6</span>
+                            </label>
+                            <input type="number" class="form-input" id="assetMonths-${assetCounter}" placeholder="12" value="12" min="1" max="12" oninput="calculateAllDepreciation()">
+                        </div>
+                    </div>
+                    <div style="margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px dashed var(--color-neutral-300); display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: var(--font-size-sm); color: var(--color-neutral-500);">Depreciation:</span>
+                        <span id="assetDep-${assetCounter}" style="font-weight: 700; color: var(--tier-4);">₹0</span>
+                    </div>
+                </div>
+            `;
+
+            assetRegister.insertAdjacentHTML('beforeend', assetHtml);
+            calculateAllDepreciation();
+        }
+
+        function removeAsset(id) {
+            const assetEl = document.getElementById(`asset-${id}`);
+            if (assetEl) {
+                assetEl.remove();
+            }
+
+            // Check if any assets remain
+            const assetRegister = document.getElementById('asset-register');
+            if (assetRegister && assetRegister.children.length === 0) {
+                document.getElementById('no-assets-msg')?.classList.remove('hidden');
+                document.getElementById('depreciation-summary')?.classList.add('hidden');
+            }
+
+            calculateAllDepreciation();
+        }
+
+        function calculateAllDepreciation() {
+            const assetRegister = document.getElementById('asset-register');
+            if (!assetRegister) return;
+
+            let totalDep = 0;
+            const assetRows = assetRegister.querySelectorAll('.asset-row');
+
+            assetRows.forEach(row => {
+                const id = row.id.replace('asset-', '');
+                const assetType = document.getElementById(`assetType-${id}`)?.value || 'plant15';
+                const wdv = getVal(`assetWDV-${id}`);
+                const months = Math.min(12, Math.max(1, getVal(`assetMonths-${id}`) || 12));
+
+                const rate = TaxConfig.DEP_RATES[assetType]?.rate || 0.15;
+
+                // WDV depreciation: Rate * WDV * (Months/12)
+                // For assets used < 180 days, half rate applies (simplified: if months <= 6)
+                const effectiveRate = months <= 6 ? rate / 2 : rate;
+                const depreciation = Math.round(wdv * effectiveRate);
+
+                const depEl = document.getElementById(`assetDep-${id}`);
+                if (depEl) depEl.textContent = formatCurrency(depreciation);
+
+                totalDep += depreciation;
+            });
+
+            // Update summary
+            const summaryEl = document.getElementById('depreciation-summary');
+            const totalEl = document.getElementById('totalDepreciation');
+
+            if (assetRows.length > 0) {
+                summaryEl?.classList.remove('hidden');
+                if (totalEl) totalEl.textContent = formatCurrency(totalDep);
+            } else {
+                summaryEl?.classList.add('hidden');
+            }
+
+            // Store in state
+            TaxState.assets = [];
+            assetRows.forEach(row => {
+                const id = row.id.replace('asset-', '');
+                TaxState.assets.push({
+                    type: document.getElementById(`assetType-${id}`)?.value,
+                    wdv: getVal(`assetWDV-${id}`),
+                    months: getVal(`assetMonths-${id}`)
+                });
+            });
+            TaxState.totalDepreciation = totalDep;
+            saveState();
+        }
+
+        function applyDepreciation() {
+            const totalDep = TaxState.totalDepreciation || 0;
+            const depInput = document.getElementById('expDepreciation');
+            if (depInput) {
+                depInput.value = totalDep;
+                updateBusinessSummary();
+            }
+        }
+
         function attachInputListeners() {
             // Attach change listeners to all inputs for auto-calculation
             document.querySelectorAll('.form-input').forEach(input => {
@@ -1960,17 +2904,13 @@
                 salaryEl.innerHTML = `<strong>Salary Summary:</strong> Gross: ${formatCurrency(gross)} | HRA Exemption: ${formatCurrency(hraExemption)} | <strong>Net Taxable: ${formatCurrency(net)}</strong>`;
             }
 
-            // Update business summary
-            const businessEl = document.getElementById('business-summary');
-            if (businessEl) {
-                const turnover = getVal('turnover44AD');
-                const digital = getVal('digital44AD');
-                const cash = turnover - digital;
-                const profit = (digital * 0.06) + (cash * 0.08);
-                businessEl.innerHTML = `<strong>Business Income:</strong> Deemed Profit: ${formatCurrency(profit)}`;
+            // Update business summary (delegate to specialized function)
+            if (document.getElementById('business-summary')) {
+                updateBusinessSummary();
             }
 
-            // Update other summaries similarly...
+            // Update capital gains summary
+            updateCapitalGainsSummary();
         }
 
         // ============================================
@@ -1980,11 +2920,8 @@
             const container = document.getElementById('deductions-container');
             const warning = document.getElementById('deductions-new-regime-warning');
 
-            if (TaxState.regimePreference === 'new') {
-                warning.classList.remove('hidden');
-            } else {
-                warning.classList.add('hidden');
-            }
+            // Always show deductions - they're used for old regime comparison
+            warning.classList.add('hidden');
 
             container.innerHTML = `
                 <div class="section-accordion">
@@ -2071,7 +3008,7 @@
 
                 <div class="section-accordion">
                     <div class="section-header" onclick="toggleSectionAccordion(this)">
-                        <h3>Other Deductions</h3>
+                        <h3>NPS & Education</h3>
                         <div class="section-toggle">▼</div>
                     </div>
                     <div class="section-body">
@@ -2087,24 +3024,140 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">80E - Education Loan Interest</label>
+                                    <label class="form-label">
+                                        80E - Education Loan Interest
+                                        <span class="hint">No upper limit, 8 years max</span>
+                                    </label>
                                     <div class="input-currency">
                                         <input type="number" class="form-input" id="ded80E" placeholder="0" value="0">
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-row cols-2">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-accordion">
+                    <div class="section-header" onclick="toggleSectionAccordion(this)">
+                        <h3>Disability & Medical (80DD, 80DDB, 80U)</h3>
+                        <div class="section-toggle">▼</div>
+                    </div>
+                    <div class="section-body">
+                        <div class="section-body-inner">
+                            <div class="form-row cols-3">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        80DD - Disabled Dependent
+                                        <span class="limit">₹75K / ₹1.25L (severe)</span>
+                                    </label>
+                                    <select class="form-select" id="ded80DD">
+                                        <option value="0">Not Applicable</option>
+                                        <option value="75000">Disability (40-80%) - ₹75,000</option>
+                                        <option value="125000">Severe (80%+) - ₹1,25,000</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        80DDB - Medical Treatment
+                                        <span class="limit">Max ₹40K (₹1L for senior)</span>
+                                    </label>
+                                    <div class="input-currency">
+                                        <input type="number" class="form-input" id="ded80DDB" placeholder="0" value="0">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        80U - Self Disability
+                                        <span class="limit">₹75K / ₹1.25L (severe)</span>
+                                    </label>
+                                    <select class="form-select" id="ded80U">
+                                        <option value="0">Not Applicable</option>
+                                        <option value="75000">Disability (40-80%) - ₹75,000</option>
+                                        <option value="125000">Severe (80%+) - ₹1,25,000</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="alert alert-info" style="margin-top: var(--space-3);">
+                                <strong>Note:</strong> 80DD requires Form 10-IA certificate. 80DDB requires prescription from specialist doctor. 80U requires certificate from medical authority.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-accordion">
+                    <div class="section-header" onclick="toggleSectionAccordion(this)">
+                        <h3>Housing & Interest (80EE, 80EEA, 80GG)</h3>
+                        <div class="section-toggle">▼</div>
+                    </div>
+                    <div class="section-body">
+                        <div class="section-body-inner">
+                            <div class="form-row cols-3">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        80EE - First Home Loan Interest
+                                        <span class="limit">Max ₹50K (Loan sanctioned 2016-17)</span>
+                                    </label>
+                                    <div class="input-currency">
+                                        <input type="number" class="form-input" id="ded80EE" placeholder="0" value="0">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        80EEA - Affordable Housing
+                                        <span class="limit">Max ₹1.5L (Stamp ≤₹45L)</span>
+                                    </label>
+                                    <div class="input-currency">
+                                        <input type="number" class="form-input" id="ded80EEA" placeholder="0" value="0">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        80GG - Rent Paid (No HRA)
+                                        <span class="limit">Max ₹5K/month</span>
+                                    </label>
+                                    <div class="input-currency">
+                                        <input type="number" class="form-input" id="ded80GG" placeholder="0" value="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="alert alert-info" style="margin-top: var(--space-3);">
+                                <strong>80GG:</strong> For individuals who don't receive HRA. Deduction = least of: Rent paid - 10% of income, 25% of total income, or ₹5,000/month (₹60K/year).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-accordion">
+                    <div class="section-header" onclick="toggleSectionAccordion(this)">
+                        <h3>Savings & Donations (80TTA, 80TTB, 80G)</h3>
+                        <div class="section-toggle">▼</div>
+                    </div>
+                    <div class="section-body">
+                        <div class="section-body-inner">
+                            <div class="form-row cols-3">
                                 <div class="form-group">
                                     <label class="form-label">
                                         80TTA - Savings Interest
-                                        <span class="limit">Max ₹10K</span>
+                                        <span class="limit">Max ₹10K (Non-seniors)</span>
                                     </label>
                                     <div class="input-currency">
                                         <input type="number" class="form-input" id="ded80TTA" placeholder="0" value="0">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">80G - Donations</label>
+                                    <label class="form-label">
+                                        80TTB - Senior Interest
+                                        <span class="limit">Max ₹50K (60+ years)</span>
+                                    </label>
+                                    <div class="input-currency">
+                                        <input type="number" class="form-input" id="ded80TTB" placeholder="0" value="0">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        80G - Donations
+                                        <span class="hint">100% or 50% eligible</span>
+                                    </label>
                                     <div class="input-currency">
                                         <input type="number" class="form-input" id="ded80G" placeholder="0" value="0">
                                     </div>
@@ -2237,15 +3290,55 @@
 
             // Calculate deductions
             let totalDeductions = 0;
+
+            // 80C - Investments (limit ₹1.5L)
             totalDeductions += Math.min(150000,
                 getVal('ded80C_ppf') + getVal('ded80C_elss') + getVal('ded80C_lic') +
                 getVal('ded80C_nsc') + getVal('ded80C_hlp') + getVal('ded80C_tuition')
             );
+
+            // 80CCD(1B) - NPS (limit ₹50K)
             totalDeductions += Math.min(50000, getVal('ded80CCD1B'));
-            totalDeductions += Math.min(25000, getVal('ded80D_self'));
+
+            // 80D - Health Insurance
+            const isSenior = ageGroup === 'senior' || ageGroup === 'supersenior';
+            const d80DSelfLimit = isSenior ? 50000 : 25000;
+            totalDeductions += Math.min(d80DSelfLimit, getVal('ded80D_self'));
             totalDeductions += Math.min(50000, getVal('ded80D_parents'));
+
+            // 80DD - Disabled Dependent (fixed amounts)
+            totalDeductions += parseFloat(document.getElementById('ded80DD')?.value || 0);
+
+            // 80DDB - Medical Treatment (limit based on age)
+            const d80DDBLimit = isSenior ? 100000 : 40000;
+            totalDeductions += Math.min(d80DDBLimit, getVal('ded80DDB'));
+
+            // 80E - Education Loan Interest (no limit)
             totalDeductions += getVal('ded80E');
-            totalDeductions += Math.min(10000, getVal('ded80TTA'));
+
+            // 80EE - First Home Loan Interest (limit ₹50K)
+            totalDeductions += Math.min(50000, getVal('ded80EE'));
+
+            // 80EEA - Affordable Housing Interest (limit ₹1.5L)
+            totalDeductions += Math.min(150000, getVal('ded80EEA'));
+
+            // 80GG - Rent Paid without HRA (limit ₹60K per year)
+            totalDeductions += Math.min(60000, getVal('ded80GG'));
+
+            // 80TTA - Savings Interest for Non-seniors (limit ₹10K)
+            if (!isSenior) {
+                totalDeductions += Math.min(10000, getVal('ded80TTA'));
+            }
+
+            // 80TTB - Interest for Seniors (limit ₹50K)
+            if (isSenior) {
+                totalDeductions += Math.min(50000, getVal('ded80TTB'));
+            }
+
+            // 80U - Self Disability (fixed amounts)
+            totalDeductions += parseFloat(document.getElementById('ded80U')?.value || 0);
+
+            // 80G - Donations (no standard limit, depends on donation type)
             totalDeductions += getVal('ded80G');
 
             // Standard deduction
@@ -2308,6 +3401,82 @@
             // Store results
             TaxState.results = { newTotal, oldTotal, savings };
             saveState();
+
+            // Update TDS reconciliation
+            updateTDSReconciliation();
+        }
+
+        function updateTDSReconciliation() {
+            const results = TaxState.results;
+            if (!results) return;
+
+            // Get recommended tax (lower of the two)
+            const taxLiability = Math.min(results.newTotal, results.oldTotal);
+
+            // Sum all TDS and tax paid
+            const totalPaid =
+                getVal('tds192') + getVal('tds194A') + getVal('tds194') +
+                getVal('tds194J') + getVal('tds194I') + getVal('tdsOther') +
+                getVal('advanceTax') + getVal('selfAssessment');
+
+            const balance = totalPaid - taxLiability;
+
+            // Update UI
+            const liabilityEl = document.getElementById('recTaxLiability');
+            const paidEl = document.getElementById('recTotalPaid');
+            const balanceEl = document.getElementById('recBalance');
+            const messageEl = document.getElementById('recMessage');
+
+            if (liabilityEl) liabilityEl.textContent = formatCurrency(taxLiability);
+            if (paidEl) paidEl.textContent = formatCurrency(totalPaid);
+
+            if (balanceEl) {
+                balanceEl.textContent = formatCurrency(Math.abs(balance));
+                if (balance >= 0) {
+                    balanceEl.style.color = 'var(--color-accent-green)';
+                } else {
+                    balanceEl.style.color = 'var(--color-accent-red)';
+                }
+            }
+
+            if (messageEl) {
+                if (balance > 0) {
+                    messageEl.innerHTML = `🎉 <strong>Refund Due:</strong> ${formatCurrency(balance)} will be credited to your bank account after processing.`;
+                    messageEl.style.background = 'rgba(76, 175, 80, 0.15)';
+                    messageEl.style.color = 'var(--color-accent-green)';
+                } else if (balance < 0) {
+                    messageEl.innerHTML = `⚠️ <strong>Tax Payable:</strong> ${formatCurrency(Math.abs(balance))} needs to be paid via Challan 280 before filing ITR.`;
+                    messageEl.style.background = 'rgba(244, 67, 54, 0.15)';
+                    messageEl.style.color = 'var(--color-accent-red)';
+                } else {
+                    messageEl.innerHTML = `✅ <strong>Nil Balance:</strong> No additional tax payable and no refund due.`;
+                    messageEl.style.background = 'var(--color-neutral-200)';
+                    messageEl.style.color = 'var(--color-neutral-600)';
+                }
+            }
+        }
+
+        function exportToPDF() {
+            // Simple PDF export using print dialog with PDF option
+            const printStyles = `
+                @media print {
+                    body { background: #fff !important; }
+                    .wizard-header, .wizard-nav, .btn, .card-title .icon { display: none !important; }
+                    .wizard-container { box-shadow: none !important; }
+                    .app-header { color: #000 !important; background: none !important; }
+                    .app-title { -webkit-text-fill-color: #1a1a2e !important; background: none !important; }
+                    .regime-card { break-inside: avoid; }
+                }
+            `;
+
+            const styleEl = document.createElement('style');
+            styleEl.textContent = printStyles;
+            document.head.appendChild(styleEl);
+
+            window.print();
+
+            // Clean up after a delay
+            setTimeout(() => styleEl.remove(), 1000);
         }
 
         // ============================================
@@ -2322,10 +3491,6 @@
                 if (card) selectAssesseeType(card);
             }
 
-            if (TaxState.regimePreference) {
-                selectRegime(TaxState.regimePreference);
-            }
-
             // Restore income sources
             Object.entries(TaxState.incomeSources).forEach(([source, selected]) => {
                 if (selected) {
@@ -2338,7 +3503,60 @@
             if (TaxState.currentStep > 1) {
                 goToStep(TaxState.currentStep);
             }
+
+            // Add keyboard navigation support
+            setupKeyboardNavigation();
         });
+
+        function setupKeyboardNavigation() {
+            // Wizard step keyboard navigation
+            document.querySelectorAll('.wizard-step').forEach(step => {
+                step.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        goToStep(parseInt(step.dataset.step));
+                    }
+                });
+            });
+
+            // Assessee card keyboard navigation
+            document.querySelectorAll('.assessee-card').forEach(card => {
+                card.setAttribute('tabindex', '0');
+                card.setAttribute('role', 'button');
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        selectAssesseeType(card);
+                    }
+                });
+            });
+
+            // Income source card keyboard navigation
+            document.querySelectorAll('.income-source-card').forEach(card => {
+                card.setAttribute('tabindex', '0');
+                card.setAttribute('role', 'checkbox');
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleIncomeSource(card);
+                    }
+                });
+            });
+
+            // Section accordion keyboard navigation
+            document.querySelectorAll('.section-header').forEach(header => {
+                header.setAttribute('tabindex', '0');
+                header.setAttribute('role', 'button');
+                header.setAttribute('aria-expanded', header.classList.contains('open'));
+                header.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleSectionAccordion(header);
+                        header.setAttribute('aria-expanded', header.classList.contains('open'));
+                    }
+                });
+            });
+        }
     </script>
 </body>
 </html>
